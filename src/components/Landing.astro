@@ -1,0 +1,151 @@
+---
+import Base from '../layouts/Base.astro';
+import { ui, languages, langPath, type Lang } from '../i18n/ui';
+import { FORM_ENDPOINT, BOOKING_URL, WHATSAPP_URL, TELEGRAM_URL, CONTACT_EMAIL } from '../config';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = ui[lang];
+const year = new Date().getFullYear();
+---
+
+<Base lang={lang} title={t.meta.title} description={t.meta.description}>
+  <header class="header">
+    <div class="container header__inner">
+      <a class="logo" href={langPath[lang]}>Nex<span>Flow</span></a>
+      <nav class="nav" aria-label="Main">
+        <a href="#services">{t.nav.services}</a>
+        <a href="#why">{t.nav.why}</a>
+        <a href="#demo">{t.nav.demo}</a>
+        <a href="#call">{t.nav.call}</a>
+        <a href="#contact">{t.nav.contact}</a>
+      </nav>
+      <div class="langs">
+        {
+          (Object.keys(languages) as Lang[]).map((l) => (
+            <a href={langPath[l]} class:list={['langs__item', { active: l === lang }]} hreflang={l}>
+              {languages[l]}
+            </a>
+          ))
+        }
+      </div>
+      <a class="btn btn--small header__cta" href="#contact">{t.cta.lead}</a>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="container">
+        <h1>{t.hero.title}</h1>
+        <p class="hero__subtitle">{t.hero.subtitle}</p>
+        <div class="hero__actions">
+          <a class="btn" href="#contact">{t.cta.lead}</a>
+          <a class="btn btn--ghost" href="#call">{t.cta.call}</a>
+        </div>
+      </div>
+    </section>
+
+    <section id="services" class="section">
+      <div class="container">
+        <h2>{t.services.title}</h2>
+        <div class="grid">
+          {
+            t.services.items.map((item, i) => (
+              <article class="card">
+                <span class="card__num">0{i + 1}</span>
+                <h3>{item.title}</h3>
+                <p>{item.text}</p>
+              </article>
+            ))
+          }
+        </div>
+      </div>
+    </section>
+
+    <section id="why" class="section section--alt">
+      <div class="container">
+        <h2>{t.why.title}</h2>
+        <div class="grid">
+          {
+            t.why.items.map((item) => (
+              <div class="feature">
+                <h3>{item.title}</h3>
+                <p>{item.text}</p>
+              </div>
+            ))
+          }
+        </div>
+      </div>
+    </section>
+
+    <section id="demo" class="section">
+      <div class="container">
+        <h2>{t.demo.title}</h2>
+        <p class="section__lead">{t.demo.note}</p>
+        <div class="grid">
+          {
+            t.demo.items.map((item) => (
+              <article class="card card--demo">
+                <span class="badge">{t.demo.badge}</span>
+                <h3>{item.title}</h3>
+                <p>{item.text}</p>
+              </article>
+            ))
+          }
+        </div>
+      </div>
+    </section>
+
+    <section id="call" class="section section--accent">
+      <div class="container call">
+        <div>
+          <h2>{t.call.title}</h2>
+          <p>{t.call.text}</p>
+        </div>
+        <a class="btn btn--light" href={BOOKING_URL} target="_blank" rel="noopener">{t.call.button}</a>
+      </div>
+    </section>
+
+    <section id="contact" class="section">
+      <div class="container contact">
+        <div>
+          <h2>{t.contact.title}</h2>
+          <p class="section__lead">{t.contact.text}</p>
+          <p class="contact__messengers">{t.contact.messengers}</p>
+          <div class="messengers">
+            <a class="btn btn--ghost btn--small" href={WHATSAPP_URL} target="_blank" rel="noopener">WhatsApp</a>
+            <a class="btn btn--ghost btn--small" href={TELEGRAM_URL} target="_blank" rel="noopener">Telegram</a>
+          </div>
+        </div>
+        <form class="form" method="POST" action={FORM_ENDPOINT || '#'}>
+          <input type="hidden" name="lang" value={lang} />
+          <label>
+            {t.contact.name}
+            <input type="text" name="name" required autocomplete="name" />
+          </label>
+          <label>
+            {t.contact.contact}
+            <input type="text" name="contact" required autocomplete="email" />
+          </label>
+          <label>
+            {t.contact.task}
+            <textarea name="task" rows="4"></textarea>
+          </label>
+          <button class="btn" type="submit">{t.contact.submit}</button>
+          <p class="form__consent">{t.contact.consent}</p>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer__inner">
+      <span>© {year} NexFlow</span>
+      {CONTACT_EMAIL && <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>}
+      <a href="#">{t.footer.privacy}</a>
+    </div>
+  </footer>
+</Base>
