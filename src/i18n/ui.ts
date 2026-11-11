@@ -9,6 +9,12 @@ export const languages = {
 
 export type Lang = keyof typeof languages;
 
+export const languageNames: Record<Lang, string> = {
+  et: 'Eesti',
+  ru: 'Русский',
+  en: 'English',
+};
+
 export const langPath: Record<Lang, string> = {
   et: '/',
   ru: '/ru/',
@@ -37,7 +43,11 @@ export interface Dict {
     messengers: string;
   };
   footer: { privacy: string };
+  themes: { label: string; light: string; dark: string; emerald: string; violet: string };
 }
+
+export const themeIds = ['light', 'dark', 'emerald', 'violet'] as const;
+export type ThemeId = (typeof themeIds)[number];
 
 export const ui: Record<Lang, Dict> = {
   ru: {
@@ -98,6 +108,7 @@ export const ui: Record<Lang, Dict> = {
       messengers: 'Или напишите в мессенджер:',
     },
     footer: { privacy: 'Политика конфиденциальности' },
+    themes: { label: 'Тема', light: 'Светлая', dark: 'Тёмная', emerald: 'Изумруд', violet: 'Фиолетовая' },
   },
 
   et: {
@@ -161,6 +172,7 @@ export const ui: Record<Lang, Dict> = {
       messengers: 'Või kirjuta messengeris:',
     },
     footer: { privacy: 'Privaatsuspoliitika' },
+    themes: { label: 'Teema', light: 'Hele', dark: 'Tume', emerald: 'Smaragd', violet: 'Violetne' },
   },
 
   en: {
@@ -218,5 +230,6 @@ export const ui: Record<Lang, Dict> = {
       messengers: 'Or message us:',
     },
     footer: { privacy: 'Privacy policy' },
+    themes: { label: 'Theme', light: 'Light', dark: 'Dark', emerald: 'Emerald', violet: 'Violet' },
   },
 };

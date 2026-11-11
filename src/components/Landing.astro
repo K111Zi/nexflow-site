@@ -1,6 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
-import { ui, languages, langPath, type Lang } from '../i18n/ui';
+import { ui, languages, languageNames, langPath, themeIds, type Lang } from '../i18n/ui';
 import { FORM_ENDPOINT, BOOKING_URL, WHATSAPP_URL, TELEGRAM_URL, CONTACT_EMAIL } from '../config';
 
 interface Props {
@@ -23,14 +23,49 @@ const year = new Date().getFullYear();
         <a href="#call">{t.nav.call}</a>
         <a href="#contact">{t.nav.contact}</a>
       </nav>
-      <div class="langs">
-        {
-          (Object.keys(languages) as Lang[]).map((l) => (
-            <a href={langPath[l]} class:list={['langs__item', { active: l === lang }]} hreflang={l}>
-              {languages[l]}
-            </a>
-          ))
-        }
+      <div class="dropdown dropdown--themes">
+        <button
+          type="button"
+          class="dropdown__toggle"
+          aria-haspopup="true"
+          aria-expanded="false"
+          aria-label={t.themes.label}
+          title={t.themes.label}
+        >
+          <span class="swatch swatch--current" aria-hidden="true"></span>
+        </button>
+        <div class="dropdown__menu" role="group" aria-label={t.themes.label}>
+          {
+            themeIds.map((id) => (
+              <button type="button" class="dropdown__item" data-theme-set={id} aria-pressed="false">
+                <span class={`swatch swatch--${id}`} aria-hidden="true" />
+                {t.themes[id]}
+              </button>
+            ))
+          }
+        </div>
+      </div>
+      <div class="dropdown dropdown--langs">
+        <button type="button" class="dropdown__toggle dropdown__toggle--text" aria-haspopup="true" aria-expanded="false">
+          {languages[lang]}
+          <span class="dropdown__caret" aria-hidden="true">▾</span>
+        </button>
+        <div class="dropdown__menu">
+          {
+            (Object.keys(languages) as Lang[]).map((l) => (
+              <a
+                href={langPath[l]}
+                class:list={['dropdown__item', { active: l === lang }]}
+                hreflang={l}
+                lang={l}
+                aria-current={l === lang ? 'page' : undefined}
+              >
+                <span class="dropdown__code">{languages[l]}</span>
+                {languageNames[l]}
+              </a>
+            ))
+          }
+        </div>
       </div>
       <a class="btn btn--small header__cta" href="#contact">{t.cta.lead}</a>
     </div>
@@ -148,4 +183,56 @@ const year = new Date().getFullYear();
       <a href="#">{t.footer.privacy}</a>
     </div>
   </footer>
+
+  <script>
+    const root = document.documentElement;
+    const buttons = document.querySelectorAll<HTMLButtonElement>('[data-theme-set]');
+
+    function mark(theme: string) {
+      buttons.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.themeSet === theme)));
+    }
+
+    mark(root.dataset.theme || 'light');
+
+    buttons.forEach((b) =>
+      b.addEventListener('click', () => {
+        const theme = b.dataset.themeSet!;
+        root.dataset.theme = theme;
+        try {
+          localStorage.setItem('theme', theme);
+        } catch (e) {}
+        mark(theme);
+        closeAll();
+      }),
+    );
+
+    // Выпадающие меню: открываются наведением (CSS), а на телефоне и с клавиатуры — нажатием.
+    const dropdowns = document.querySelectorAll<HTMLElement>('.dropdown');
+
+    function closeAll(except?: HTMLElement) {
+      dropdowns.forEach((d) => {
+        if (d === except) return;
+        d.classList.remove('open');
+        d.querySelector('.dropdown__toggle')?.setAttribute('aria-expanded', 'false');
+      });
+    }
+
+    dropdowns.forEach((d) => {
+      const toggle = d.querySelector<HTMLButtonElement>('.dropdown__toggle')!;
+      toggle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isOpen = d.classList.toggle('open');
+        toggle.setAttribute('aria-expanded', String(isOpen));
+        closeAll(d);
+      });
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!(e.target as HTMLElement).closest('.dropdown')) closeAll();
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeAll();
+    });
+  </script>
 </Base>
