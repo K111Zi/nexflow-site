@@ -31,7 +31,8 @@
 - **Настройки** — `src/content/settings.json` (WhatsApp-номер, Telegram @имя, ссылка записи, e-mail, реквизиты, GA ID) → `src/config.ts` собирает ссылки (пусто → `#`; на «Контактах» такие кнопки не показываются).
 - **Маршруты**: `src/pages/[lang]/index.astro` и `src/pages/[lang]/[page].astro` (getStaticPaths). Содержимое страниц — `src/components/pages/*.astro`.
 - Общее: `layouts/Base.astro` (head, SEO, тема, подключает всё ниже), `Header.astro` (меню, язык, тема, ☰), `Footer.astro`, `PageIntro`, `Cta`, `DemoCard` + `DemoModal` (кнопки `data-demo="inbox|chat|integration"`), `Helper` (подсказчик по ключевым словам, без AI), `CookieBanner`, `Logo`.
-- `public/images/robot.png` — робот из макета; `public/favicon.svg` — знак NQO.
+- **Робот на главной** — `RobotOrb.astro`: картинка шара без глаз (`public/images/robot-body.png`) + глаза в SVG поверх; глаза следят за курсором (модель «точка на сфере»: долгота/широта, поза покоя `REST` = как в макете), моргают, уважают `prefers-reduced-motion`. `public/images/robot.png` — робот с глазами (подсказчик, og:image). Обе картинки получены из исходника макета скриптом `scripts/process-robot.ps1` (обрезка по эллипсу без светлой каймы, заливка «дырки» правого глаза, стирание глаз); исходник — `git show 13d962e:public/images/robot.png`.
+- `public/favicon.svg` — знак NQO.
 - **Форма** — `contact` страница → `netlify/functions/lead.mjs` (`/api/lead`): name, company, contact, interest, task, consent (обязательно), ловушка `website`; отправка в **Telegram**. Секреты `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID` — `.env` (не в git) и Netlify. Сейчас **тестовый бот**, заявки в личный чат владельца (ID в `.env`).
 - **Админка Keystatic** — `keystatic.config.ts` (схема повторяет `Dict`), `/keystatic`, `storage: github` (`K111Zi/nexflow-site`). GitHub App `k111zi-keystatic` создан; ключи `KEYSTATIC_*`, `PUBLIC_KEYSTATIC_GITHUB_APP_SLUG` — в `.env` и (нужно) в Netlify. После правок в админке — `git pull`.
 - `src/i18n/privacy.ts` — текст политики (шаблон GDPR, в коде). `sitemap.xml.ts`, `robots.txt.ts` — все страницы.
@@ -51,10 +52,18 @@
 - Сайт: **https://creative-sunshine-6d5e20.netlify.app**
 - Редиректы проверять через `curl.exe` (Invoke-WebRequest в PS 5.1 падает на 301).
 
+## Состояние на 2026-11-13
+
+- Сайт опубликован и работает: 21 страница, форма на сайте шлёт заявки в Telegram (проверено), вход в админку перенаправляет на GitHub (сохранение через админку владелец ещё не пробовал).
+- Переменные окружения в Netlify заданы (Telegram + Keystatic). **После изменения переменных нужна новая сборка** — иначе функции их не видят.
+- Netlify CLI: вход выполнен, папка привязана к сайту (`.netlify/state.json`, аккаунт `kizi`). Пересборка: `npx netlify-cli api createSiteBuild --data '{"site_id":"<id из state.json>"}'`.
+- **Не выложено на сайт:** коммит с роботом, следящим за курсором, и исправлением белой каймы в тёмной теме — только локально, ждёт `git push origin main` (спросить владельца). Возможный мелкий дефект: светлая точка у правого края шара при взгляде влево.
+- В работе: **контакты и запись на звонок** — ждём от владельца номер WhatsApp, @имя Telegram, e-mail, ссылку Cal.com (или он внесёт сам в админке → «Настройки»). Потом — встроить календарь Cal.com в страницу «Контакты».
+
 ## Что дальше
 
-1. **Netlify:** импортировать переменные из `.env` (Telegram + Keystatic) и пересобрать — тест формы на сайте вернул `not_configured`; затем проверить заявку и вход в админку на сайте.
-2. Заполнить настройки: WhatsApp, Telegram, Cal.com, e-mail, реквизиты (зарегистрирована ли компания — не уточнено), GA ID.
+1. Выложить робота (push), заполнить контакты (см. выше).
+2. Реквизиты компании (зарегистрирована ли — не уточнено), GA ID.
 3. Настоящий бот NQO вместо тестового (токен тестового светился в чате).
 4. Домен под NQO → `site` в `astro.config.mjs`; проверить свободность имени/знака NQO.
 5. Политику — юристу; ET/EN тексты — носителям. Решить про «разработку сайтов» в услугах.

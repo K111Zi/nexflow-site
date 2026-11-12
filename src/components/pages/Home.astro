@@ -2,6 +2,7 @@
 import Lines from '../Lines.astro';
 import DemoCard from '../DemoCard.astro';
 import Cta from '../Cta.astro';
+import RobotOrb from '../RobotOrb.astro';
 import { ui, pagePath, demoKeys, type Lang } from '../../i18n/ui';
 
 interface Props {
@@ -27,7 +28,7 @@ const num = (i: number) => String(i + 1).padStart(2, '0');
     <div class="hero-art">
       <div class="orb-stage">
         <div class="bubble"><Lines text={t.bubble} /></div>
-        <span class="orb"><img src="/images/robot.png" alt={t.robotAlt} width="310" height="310" fetchpriority="high" /></span>
+        <RobotOrb alt={t.robotAlt} />
       </div>
     </div>
   </section>

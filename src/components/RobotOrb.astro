@@ -1,0 +1,139 @@
+---
+// Робот NQO на первом экране: шар (картинка без глаз) + глаза в SVG,
+// которые «живут» на поверхности сферы, следят за курсором и иногда моргают.
+// Координаты — в системе картинки 322×322; шар — эллипс (171, 163), 147.5 × 155.
+
+interface Props {
+  alt: string;
+}
+
+const { alt } = Astro.props;
+
+// Модель: глаз — точка на сфере (долгота/широта, градусы). Лицо смотрит в (lon, lat),
+// глаза смещены от центра лица. Поза покоя повторяет макет (взгляд вправо-вверх).
+const BALL = { cx: 171, cy: 163, rx: 147.5, ry: 155 };
+const REST = { lon: 32.2, lat: 9.5 };
+const EYES = [
+  { dLon: -28.3, dLat: -1.3 },
+  { dLon: 28.3, dLat: 1.3 },
+];
+const rad = (d: number) => (d * Math.PI) / 180;
+const f = (n: number) => n.toFixed(3);
+const transform = (lon: number, lat: number) => {
+  const lo = rad(lon), la = rad(lat);
+  const x = BALL.cx + BALL.rx * Math.sin(lo) * Math.cos(la);
+  const y = BALL.cy - BALL.ry * Math.sin(la);
+  return `matrix(${f(Math.cos(lo))} 0 ${f(Math.sin(lo) * Math.sin(la))} ${f(Math.cos(la))} ${f(x)} ${f(y)})`;
+};
+const config = JSON.stringify({ ball: BALL, rest: REST, eyes: EYES });
+---
+
+<span class="orb" data-robot={config}>
+  <img src="/images/robot-body.png" alt={alt} width="310" height="310" fetchpriority="high" />
+  <svg class="orb-eyes" viewBox="0 0 322 322" aria-hidden="true">
+    <defs>
+      <clipPath id="orb-clip"><ellipse cx="171" cy="163" rx="146" ry="153.5"></ellipse></clipPath>
+      <filter id="eye-glow" x="-60%" y="-150%" width="220%" height="400%">
+        <feGaussianBlur stdDeviation="2" result="blur"></feGaussianBlur>
+        <feMerge>
+          <feMergeNode in="blur"></feMergeNode>
+          <feMergeNode in="blur"></feMergeNode>
+          <feMergeNode in="SourceGraphic"></feMergeNode>
+        </feMerge>
+      </filter>
+    </defs>
+    <g clip-path="url(#orb-clip)">
+      <g filter="url(#eye-glow)" fill="#fff" stroke="#fff" stroke-width="3" stroke-linejoin="round">
+        {
+          EYES.map((e) => (
+            <path class="orb-eye" d="M-42 9 Q0 -28 42 9 Q0 -8 -42 9Z" transform={transform(REST.lon + e.dLon, REST.lat + e.dLat)} />
+          ))
+        }
+      </g>
+    </g>
+  </svg>
+</span>
+
+<script>
+  type Cfg = {
+    ball: { cx: number; cy: number; rx: number; ry: number };
+    rest: { lon: number; lat: number };
+    eyes: { dLon: number; dLat: number }[];
+  };
+
+  const orb = document.querySelector<HTMLElement>('.orb[data-robot]');
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (orb && !reduce) {
+    const cfg = JSON.parse(orb.dataset.robot!) as Cfg;
+    const eyes = Array.from(orb.querySelectorAll<SVGPathElement>('.orb-eye'));
+    const { cx, cy, rx, ry } = cfg.ball;
+    const rad = (d: number) => (d * Math.PI) / 180;
+    const clamp01 = (v: number) => Math.max(0, Math.min(1, v));
+
+    const cur = { ...cfg.rest };
+    let target = { ...cfg.rest };
+    let blink = 1;
+    let idleTimer = 0;
+    let visible = true;
+
+    const draw = () => {
+      eyes.forEach((el, i) => {
+        const lo = rad(cur.lon + cfg.eyes[i].dLon);
+        const la = rad(cur.lat + cfg.eyes[i].dLat);
+        const x = cx + rx * Math.sin(lo) * Math.cos(la);
+        const y = cy - ry * Math.sin(la);
+        const a = Math.cos(lo);
+        const c = Math.sin(lo) * Math.sin(la) * blink;
+        const d = Math.cos(la) * blink;
+        el.setAttribute('transform', `matrix(${a.toFixed(3)} 0 ${c.toFixed(3)} ${d.toFixed(3)} ${x.toFixed(2)} ${y.toFixed(2)})`);
+        // глаз, ушедший за край шара, плавно гаснет
+        el.style.opacity = String(clamp01((a - 0.1) / 0.25));
+      });
+    };
+
+    // Курсор относительно центра робота → куда смотреть.
+    window.addEventListener(
+      'pointermove',
+      (e) => {
+        const r = orb.getBoundingClientRect();
+        const dx = e.clientX - (r.left + r.width / 2);
+        const dy = e.clientY - (r.top + r.height / 2);
+        target = { lon: 42 * Math.tanh(dx / 380), lat: 4 + 24 * Math.tanh(-dy / 380) };
+        clearTimeout(idleTimer);
+        idleTimer = window.setTimeout(() => (target = { ...cfg.rest }), 4000);
+      },
+      { passive: true },
+    );
+    document.addEventListener('mouseleave', () => (target = { ...cfg.rest }));
+
+    // Моргание раз в 2.5–6 секунд.
+    const scheduleBlink = () =>
+      window.setTimeout(() => {
+        const start = performance.now();
+        const step = (now: number) => {
+          const t = Math.min(1, (now - start) / 170);
+          blink = 1 - 0.9 * Math.sin(Math.PI * t);
+          if (t < 1) requestAnimationFrame(step);
+          else {
+            blink = 1;
+            scheduleBlink();
+          }
+        };
+        requestAnimationFrame(step);
+      }, 2500 + Math.random() * 3500);
+    scheduleBlink();
+
+    // Плавное движение; пока робот не на экране — не тратим ресурсы.
+    new IntersectionObserver(([entry]) => (visible = entry.isIntersecting)).observe(orb);
+    const loop = () => {
+      if (visible) {
+        cur.lon += (target.lon - cur.lon) * 0.1;
+        cur.lat += (target.lat - cur.lat) * 0.1;
+        draw();
+      }
+      requestAnimationFrame(loop);
+    };
+    requestAnimationFrame(loop);
+  }
+</script>

@@ -60,7 +60,7 @@
   --shadow: rgba(0, 0, 0, 0.5);
   --error: #ff6b6b;
   --ok: #5fd38b;
-  --robot-glow: rgba(255, 255, 255, 0.14);
+  --robot-glow: transparent;
 }
 
 /* ===== Основа ===== */
@@ -526,6 +526,15 @@ img {
   width: 100%;
   height: 100%;
   object-fit: contain;
+}
+
+/* Глаза робота поверх картинки (RobotOrb.astro) */
+.orb-eyes {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
 }
 
 .bubble {
