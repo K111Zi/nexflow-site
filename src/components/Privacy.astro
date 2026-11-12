@@ -1,0 +1,54 @@
+---
+import Base from '../layouts/Base.astro';
+import Footer from './Footer.astro';
+import { ui, langPath, privacyPath, type Lang } from '../i18n/ui';
+import { privacy, PRIVACY_UPDATED } from '../i18n/privacy';
+import { CONTACT_EMAIL, COMPANY } from '../config';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const p = privacy[lang];
+const t = ui[lang];
+
+// Пустые реквизиты показываем как [заглушку], чтобы их было видно до запуска.
+const values: Record<string, string> = {
+  company: COMPANY.name || '[company]',
+  regCode: COMPANY.regCode || '[reg. code]',
+  address: COMPANY.address || '[address]',
+  email: CONTACT_EMAIL || '[e-mail]',
+};
+const fill = (s: string) => s.replace(/\{(\w+)\}/g, (_, k) => values[k] ?? `{${k}}`);
+
+const updated = new Date(PRIVACY_UPDATED).toLocaleDateString(lang, { day: 'numeric', month: 'long', year: 'numeric' });
+---
+
+<Base lang={lang} title={`${p.title} — NexFlow`} description={p.description} path={privacyPath[lang]} alternates={privacyPath}>
+  <header class="header">
+    <div class="container header__inner">
+      <a class="logo" href={langPath[lang]}>Nex<span>Flow</span></a>
+      <a class="btn btn--ghost btn--small header__back" href={langPath[lang]}>← {t.legal.back}</a>
+    </div>
+  </header>
+
+  <main class="section">
+    <article class="container legal">
+      <h1>{p.title}</h1>
+      <p class="legal__updated">{p.updated}: <time datetime={PRIVACY_UPDATED}>{updated}</time></p>
+      {
+        p.sections.map((s) => (
+          <section>
+            <h2>{s.title}</h2>
+            {s.paragraphs.map((text) => (
+              <p>{fill(text)}</p>
+            ))}
+          </section>
+        ))
+      }
+    </article>
+  </main>
+
+  <Footer lang={lang} />
+</Base>

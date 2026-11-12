@@ -21,6 +21,12 @@ export const langPath: Record<Lang, string> = {
   en: '/en/',
 };
 
+export const privacyPath: Record<Lang, string> = {
+  et: '/privacy/',
+  ru: '/ru/privacy/',
+  en: '/en/privacy/',
+};
+
 type Item = { title: string; text: string };
 
 export interface Dict {
@@ -45,7 +51,9 @@ export interface Dict {
     success: string;
     error: string;
   };
-  footer: { privacy: string };
+  footer: { privacy: string; cookies: string; regCode: string };
+  cookie: { text: string; accept: string; decline: string; more: string };
+  legal: { back: string };
   themes: { label: string; light: string; dark: string; emerald: string; violet: string };
 }
 
@@ -113,7 +121,14 @@ export const ui: Record<Lang, Dict> = {
       success: 'Спасибо! Заявка отправлена — мы ответим в течение рабочего дня.',
       error: 'Не удалось отправить. Попробуйте ещё раз или напишите нам в мессенджер.',
     },
-    footer: { privacy: 'Политика конфиденциальности' },
+    footer: { privacy: 'Политика конфиденциальности', cookies: 'Настройки cookie', regCode: 'Рег. код' },
+    cookie: {
+      text: 'Мы используем cookie Google Analytics, чтобы понимать, как посетители пользуются сайтом. Они включатся, только если вы согласитесь.',
+      accept: 'Принять',
+      decline: 'Отклонить',
+      more: 'Подробнее',
+    },
+    legal: { back: 'На главную' },
     themes: { label: 'Тема', light: 'Светлая', dark: 'Тёмная', emerald: 'Изумруд', violet: 'Фиолетовая' },
   },
 
@@ -180,7 +195,14 @@ export const ui: Record<Lang, Dict> = {
       success: 'Aitäh! Päring on saadetud — vastame ühe tööpäeva jooksul.',
       error: 'Saatmine ebaõnnestus. Proovi uuesti või kirjuta meile messengeris.',
     },
-    footer: { privacy: 'Privaatsuspoliitika' },
+    footer: { privacy: 'Privaatsuspoliitika', cookies: 'Küpsiste seaded', regCode: 'Registrikood' },
+    cookie: {
+      text: 'Kasutame Google Analyticsi küpsiseid, et mõista, kuidas külastajad veebilehte kasutavad. Need lülituvad sisse ainult sinu nõusolekul.',
+      accept: 'Nõustun',
+      decline: 'Keeldun',
+      more: 'Loe lähemalt',
+    },
+    legal: { back: 'Avalehele' },
     themes: { label: 'Teema', light: 'Hele', dark: 'Tume', emerald: 'Smaragd', violet: 'Violetne' },
   },
 
@@ -241,7 +263,14 @@ export const ui: Record<Lang, Dict> = {
       success: 'Thank you! Your request has been sent — we will reply within one business day.',
       error: 'Could not send your request. Please try again or message us.',
     },
-    footer: { privacy: 'Privacy policy' },
+    footer: { privacy: 'Privacy policy', cookies: 'Cookie settings', regCode: 'Reg. code' },
+    cookie: {
+      text: 'We use Google Analytics cookies to understand how visitors use the site. They are only turned on if you agree.',
+      accept: 'Accept',
+      decline: 'Decline',
+      more: 'Learn more',
+    },
+    legal: { back: 'Back to home' },
     themes: { label: 'Theme', light: 'Light', dark: 'Dark', emerald: 'Emerald', violet: 'Violet' },
   },
 };

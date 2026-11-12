@@ -1,0 +1,25 @@
+---
+import { ui, privacyPath, type Lang } from '../i18n/ui';
+import { CONTACT_EMAIL, COMPANY } from '../config';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = ui[lang].footer;
+const year = new Date().getFullYear();
+---
+
+<footer class="footer">
+  <div class="container footer__inner">
+    <span>
+      © {year} {COMPANY.name}{COMPANY.regCode && ` · ${t.regCode} ${COMPANY.regCode}`}
+    </span>
+    {CONTACT_EMAIL && <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>}
+    <span class="footer__links">
+      <a href={privacyPath[lang]}>{t.privacy}</a>
+      <button type="button" class="footer__link-btn" data-cookie-settings hidden>{t.cookies}</button>
+    </span>
+  </div>
+</footer>

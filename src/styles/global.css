@@ -596,8 +596,91 @@ a {
   gap: 24px;
 }
 
-.footer__inner a:last-child {
+.footer__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
   margin-left: auto;
+}
+
+.footer__link-btn {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.footer__link-btn[hidden] {
+  display: none;
+}
+
+/* ===== Страница политики ===== */
+.header__back {
+  margin-left: auto;
+}
+
+.legal {
+  max-width: 760px;
+}
+
+.legal h1 {
+  margin-bottom: 8px;
+}
+
+.legal h2 {
+  margin-top: 36px;
+  font-size: 1.25rem;
+}
+
+.legal p {
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+.legal__updated {
+  font-size: 0.9rem;
+}
+
+/* ===== Баннер cookie ===== */
+.cookie {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  z-index: 20;
+  display: grid;
+  gap: 12px;
+  max-width: 420px;
+  padding: 18px 20px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+
+.cookie[hidden] {
+  display: none;
+}
+
+.cookie__text {
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.cookie__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+@media (max-width: 520px) {
+  .cookie {
+    left: 16px;
+    max-width: none;
+  }
 }
 
 /* ===== Телефоны и планшеты ===== */

@@ -1,0 +1,99 @@
+---
+// Баннер согласия на cookie. Google Analytics загружается только после «Принять».
+// Показывается, только если в src/config.ts указан GA_MEASUREMENT_ID.
+import { ui, privacyPath, type Lang } from '../i18n/ui';
+
+interface Props {
+  lang: Lang;
+  gaId: string;
+}
+
+const { lang, gaId } = Astro.props;
+const t = ui[lang].cookie;
+---
+
+<div class="cookie" id="cookie-banner" data-ga={gaId} role="region" aria-label="Cookie" hidden>
+  <p class="cookie__text">
+    {t.text} <a href={privacyPath[lang]}>{t.more}</a>
+  </p>
+  <div class="cookie__actions">
+    <button type="button" class="btn btn--ghost btn--small" data-consent="denied">{t.decline}</button>
+    <button type="button" class="btn btn--small" data-consent="granted">{t.accept}</button>
+  </div>
+</div>
+
+<script>
+  type Consent = 'granted' | 'denied';
+  const KEY = 'cookie-consent';
+  const banner = document.getElementById('cookie-banner') as HTMLElement | null;
+
+  const read = (): Consent | null => {
+    try {
+      const v = localStorage.getItem(KEY);
+      return v === 'granted' || v === 'denied' ? v : null;
+    } catch {
+      return null;
+    }
+  };
+
+  const save = (v: Consent) => {
+    try {
+      localStorage.setItem(KEY, v);
+    } catch {}
+  };
+
+  const w = window as any;
+
+  function loadAnalytics(id: string) {
+    if (w.gtag) return;
+    w.dataLayer = w.dataLayer || [];
+    w.gtag = function () {
+      w.dataLayer.push(arguments);
+    };
+    w.gtag('js', new Date());
+    w.gtag('config', id);
+    const s = document.createElement('script');
+    s.async = true;
+    s.src = `https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(id)}`;
+    document.head.appendChild(s);
+  }
+
+  // Удаляем cookie аналитики, если согласие отозвано.
+  function clearAnalyticsCookies() {
+    const host = location.hostname;
+    const domains = ['', host, '.' + host, '.' + host.split('.').slice(-2).join('.')];
+    document.cookie.split(';').forEach((c) => {
+      const name = c.split('=')[0].trim();
+      if (!name.startsWith('_ga')) return;
+      domains.forEach((d) => {
+        document.cookie = `${name}=; Max-Age=0; path=/${d ? `; domain=${d}` : ''}`;
+      });
+    });
+  }
+
+  if (banner) {
+    const id = banner.dataset.ga!;
+    const choice = read();
+    if (choice === 'granted') loadAnalytics(id);
+    if (!choice) banner.hidden = false;
+
+    banner.querySelectorAll<HTMLButtonElement>('[data-consent]').forEach((b) =>
+      b.addEventListener('click', () => {
+        const v = b.dataset.consent as Consent;
+        const wasGranted = read() === 'granted';
+        save(v);
+        banner.hidden = true;
+        if (v === 'granted') loadAnalytics(id);
+        else if (wasGranted) {
+          clearAnalyticsCookies();
+          location.reload(); // выгружаем уже загруженную аналитику
+        }
+      }),
+    );
+
+    document.querySelectorAll<HTMLElement>('[data-cookie-settings]').forEach((el) => {
+      el.hidden = false;
+      el.addEventListener('click', () => (banner.hidden = false));
+    });
+  }
+</script>

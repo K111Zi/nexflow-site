@@ -1,7 +1,8 @@
 ---
 import Base from '../layouts/Base.astro';
+import Footer from './Footer.astro';
 import { ui, languages, languageNames, langPath, themeIds, type Lang } from '../i18n/ui';
-import { FORM_ENDPOINT, BOOKING_URL, WHATSAPP_URL, TELEGRAM_URL, CONTACT_EMAIL } from '../config';
+import { FORM_ENDPOINT, BOOKING_URL, WHATSAPP_URL, TELEGRAM_URL } from '../config';
 
 interface Props {
   lang: Lang;
@@ -9,10 +10,9 @@ interface Props {
 
 const { lang } = Astro.props;
 const t = ui[lang];
-const year = new Date().getFullYear();
 ---
 
-<Base lang={lang} title={t.meta.title} description={t.meta.description}>
+<Base lang={lang} title={t.meta.title} description={t.meta.description} path={langPath[lang]} alternates={langPath}>
   <header class="header">
     <div class="container header__inner">
       <a class="logo" href={langPath[lang]}>Nex<span>Flow</span></a>
@@ -140,7 +140,7 @@ const year = new Date().getFullYear();
           <h2>{t.call.title}</h2>
           <p>{t.call.text}</p>
         </div>
-        <a class="btn btn--light" href={BOOKING_URL} target="_blank" rel="noopener">{t.call.button}</a>
+        <a class="btn btn--light" href={BOOKING_URL} target="_blank" rel="noopener" data-track="booking">{t.call.button}</a>
       </div>
     </section>
 
@@ -151,8 +151,8 @@ const year = new Date().getFullYear();
           <p class="section__lead">{t.contact.text}</p>
           <p class="contact__messengers">{t.contact.messengers}</p>
           <div class="messengers">
-            <a class="btn btn--ghost btn--small" href={WHATSAPP_URL} target="_blank" rel="noopener">WhatsApp</a>
-            <a class="btn btn--ghost btn--small" href={TELEGRAM_URL} target="_blank" rel="noopener">Telegram</a>
+            <a class="btn btn--ghost btn--small" href={WHATSAPP_URL} target="_blank" rel="noopener" data-track="whatsapp">WhatsApp</a>
+            <a class="btn btn--ghost btn--small" href={TELEGRAM_URL} target="_blank" rel="noopener" data-track="telegram">Telegram</a>
           </div>
         </div>
         <form
@@ -188,15 +188,18 @@ const year = new Date().getFullYear();
     </section>
   </main>
 
-  <footer class="footer">
-    <div class="container footer__inner">
-      <span>© {year} NexFlow</span>
-      {CONTACT_EMAIL && <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>}
-      <a href="#">{t.footer.privacy}</a>
-    </div>
-  </footer>
+  <Footer lang={lang} />
 
   <script>
+    // События для Google Analytics. Если аналитика не включена или нет согласия — ничего не делают.
+    const track = (name: string, params: Record<string, string> = {}) => (window as any).gtag?.('event', name, params);
+
+    document.querySelectorAll<HTMLElement>('[data-track]').forEach((el) =>
+      el.addEventListener('click', () =>
+        el.dataset.track === 'booking' ? track('book_call_click') : track('contact_click', { method: el.dataset.track! }),
+      ),
+    );
+
     const root = document.documentElement;
     const buttons = document.querySelectorAll<HTMLButtonElement>('[data-theme-set]');
 
@@ -279,6 +282,7 @@ const year = new Date().getFullYear();
           if (!res.ok || !data?.ok) throw new Error(data?.error || `HTTP ${res.status}`);
           form.reset();
           show('success');
+          track('generate_lead', { form: 'contact' });
         } catch {
           show('error');
         } finally {
