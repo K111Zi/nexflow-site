@@ -1,8 +1,8 @@
 // Все внешние ссылки сайта в одном месте. Заполните, когда появятся аккаунты.
 
-// Куда отправляется форма заявки (например, адрес формы Formspree: https://formspree.io/f/xxxx).
-// Пока пусто — форма не отправляется.
-export const FORM_ENDPOINT = '';
+// Куда отправляется форма заявки: функция Netlify (netlify/functions/lead.mjs), пересылает в Telegram.
+// Работает только на Netlify или локально через `netlify dev`; при `npm run dev` форма покажет ошибку.
+export const FORM_ENDPOINT = '/api/lead';
 
 // Ссылка на запись в календаре (например, https://cal.com/nexflow/20min).
 export const BOOKING_URL = '#';

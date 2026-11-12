@@ -155,8 +155,19 @@ const year = new Date().getFullYear();
             <a class="btn btn--ghost btn--small" href={TELEGRAM_URL} target="_blank" rel="noopener">Telegram</a>
           </div>
         </div>
-        <form class="form" method="POST" action={FORM_ENDPOINT || '#'}>
+        <form
+          class="form"
+          id="lead-form"
+          method="POST"
+          action={FORM_ENDPOINT}
+          data-msg-sending={t.contact.sending}
+          data-msg-success={t.contact.success}
+          data-msg-error={t.contact.error}
+        >
           <input type="hidden" name="lang" value={lang} />
+          <div class="form__trap" aria-hidden="true">
+            <label>Website <input type="text" name="website" tabindex="-1" autocomplete="off" /></label>
+          </div>
           <label>
             {t.contact.name}
             <input type="text" name="name" required autocomplete="name" />
@@ -170,6 +181,7 @@ const year = new Date().getFullYear();
             <textarea name="task" rows="4"></textarea>
           </label>
           <button class="btn" type="submit">{t.contact.submit}</button>
+          <p class="form__status" role="status" aria-live="polite"></p>
           <p class="form__consent">{t.contact.consent}</p>
         </form>
       </div>
@@ -234,5 +246,45 @@ const year = new Date().getFullYear();
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') closeAll();
     });
+
+    // Форма заявки: отправка без перезагрузки страницы.
+    const form = document.querySelector<HTMLFormElement>('#lead-form');
+    if (form) {
+      const status = form.querySelector<HTMLElement>('.form__status')!;
+      const submit = form.querySelector<HTMLButtonElement>('button[type="submit"]')!;
+
+      const show = (kind: 'sending' | 'success' | 'error') => {
+        status.textContent = form.dataset[`msg${kind[0].toUpperCase()}${kind.slice(1)}`] || '';
+        status.className = `form__status form__status--${kind}`;
+      };
+
+      // Возврат после отправки без JavaScript: ?lead=sent или ?lead=error.
+      const result = new URLSearchParams(location.search).get('lead');
+      if (result === 'sent' || result === 'error') {
+        show(result === 'sent' ? 'success' : 'error');
+        history.replaceState(null, '', location.pathname + location.hash);
+      }
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        submit.disabled = true;
+        show('sending');
+        try {
+          const res = await fetch(form.action, {
+            method: 'POST',
+            body: new FormData(form),
+            headers: { Accept: 'application/json' },
+          });
+          const data = await res.json().catch(() => null);
+          if (!res.ok || !data?.ok) throw new Error(data?.error || `HTTP ${res.status}`);
+          form.reset();
+          show('success');
+        } catch {
+          show('error');
+        } finally {
+          submit.disabled = false;
+        }
+      });
+    }
   </script>
 </Base>

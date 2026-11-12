@@ -546,6 +546,36 @@ a {
   outline-offset: 1px;
 }
 
+.form__trap {
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.form button[disabled] {
+  opacity: 0.6;
+  cursor: progress;
+}
+
+.form__status {
+  margin: 0;
+  font-weight: 600;
+}
+
+.form__status:empty {
+  display: none;
+}
+
+.form__status--success {
+  color: var(--accent);
+}
+
+.form__status--error {
+  color: #e5484d;
+}
+
 .form__consent {
   margin: 0;
   font-size: 0.85rem;

@@ -41,6 +41,9 @@ export interface Dict {
     submit: string;
     consent: string;
     messengers: string;
+    sending: string;
+    success: string;
+    error: string;
   };
   footer: { privacy: string };
   themes: { label: string; light: string; dark: string; emerald: string; violet: string };
@@ -106,6 +109,9 @@ export const ui: Record<Lang, Dict> = {
       submit: 'Отправить заявку',
       consent: 'Нажимая кнопку, вы соглашаетесь с обработкой персональных данных.',
       messengers: 'Или напишите в мессенджер:',
+      sending: 'Отправляем…',
+      success: 'Спасибо! Заявка отправлена — мы ответим в течение рабочего дня.',
+      error: 'Не удалось отправить. Попробуйте ещё раз или напишите нам в мессенджер.',
     },
     footer: { privacy: 'Политика конфиденциальности' },
     themes: { label: 'Тема', light: 'Светлая', dark: 'Тёмная', emerald: 'Изумруд', violet: 'Фиолетовая' },
@@ -170,6 +176,9 @@ export const ui: Record<Lang, Dict> = {
       submit: 'Saada päring',
       consent: 'Nupule vajutades nõustud isikuandmete töötlemisega.',
       messengers: 'Või kirjuta messengeris:',
+      sending: 'Saadame…',
+      success: 'Aitäh! Päring on saadetud — vastame ühe tööpäeva jooksul.',
+      error: 'Saatmine ebaõnnestus. Proovi uuesti või kirjuta meile messengeris.',
     },
     footer: { privacy: 'Privaatsuspoliitika' },
     themes: { label: 'Teema', light: 'Hele', dark: 'Tume', emerald: 'Smaragd', violet: 'Violetne' },
@@ -228,6 +237,9 @@ export const ui: Record<Lang, Dict> = {
       submit: 'Send request',
       consent: 'By clicking the button, you agree to the processing of your personal data.',
       messengers: 'Or message us:',
+      sending: 'Sending…',
+      success: 'Thank you! Your request has been sent — we will reply within one business day.',
+      error: 'Could not send your request. Please try again or message us.',
     },
     footer: { privacy: 'Privacy policy' },
     themes: { label: 'Theme', light: 'Light', dark: 'Dark', emerald: 'Emerald', violet: 'Violet' },
