@@ -1,26 +1,44 @@
-// Все внешние ссылки сайта в одном месте. Заполните, когда появятся аккаунты.
+// Внешние ссылки и реквизиты сайта.
+// Значения редактируются в админке (/keystatic → «Настройки») и хранятся в src/content/settings.json.
+import settings from './content/settings.json';
+
+// Пустое поле админка может сохранить как "" или не сохранить вовсе — приводим к строке.
+const str = (v: unknown) => (typeof v === 'string' ? v.trim() : '');
+const contacts = {
+  whatsapp: str(settings.contacts?.whatsapp),
+  telegram: str(settings.contacts?.telegram),
+  bookingUrl: str(settings.contacts?.bookingUrl),
+  email: str(settings.contacts?.email),
+};
+const company = {
+  name: str(settings.company?.name),
+  regCode: str(settings.company?.regCode),
+  address: str(settings.company?.address),
+};
+const analytics = { gaId: str(settings.analytics?.gaId) };
 
 // Куда отправляется форма заявки: функция Netlify (netlify/functions/lead.mjs), пересылает в Telegram.
 // Работает только на Netlify или локально через `netlify dev`; при `npm run dev` форма покажет ошибку.
 export const FORM_ENDPOINT = '/api/lead';
 
 // Ссылка на запись в календаре (например, https://cal.com/nexflow/20min).
-export const BOOKING_URL = '#';
+export const BOOKING_URL = contacts.bookingUrl || '#';
 
-// Мессенджеры.
-export const WHATSAPP_URL = '#'; // https://wa.me/372XXXXXXXX
-export const TELEGRAM_URL = '#'; // https://t.me/username
+// Мессенджеры: из номера телефона и имени пользователя собираем ссылки.
+const phoneDigits = contacts.whatsapp.replace(/\D/g, '');
+export const WHATSAPP_URL = phoneDigits ? `https://wa.me/${phoneDigits}` : '#';
 
-export const CONTACT_EMAIL = ''; // info@...
+const telegramUser = contacts.telegram.trim().replace(/^@/, '').replace(/^https?:\/\/t\.me\//, '');
+export const TELEGRAM_URL = telegramUser ? `https://t.me/${telegramUser}` : '#';
 
-// Google Analytics 4: ID вида G-XXXXXXXXXX.
-// Пока пусто — аналитика не подключается и баннер cookie не показывается.
-export const GA_MEASUREMENT_ID = '';
+export const CONTACT_EMAIL = contacts.email.trim();
 
-// Реквизиты компании — для подвала и политики конфиденциальности.
-// Пустые поля показываются на сайте как [заглушка] — заполните до запуска.
+// Google Analytics 4: ID вида G-XXXXXXXXXX. Пусто — аналитика и баннер cookie выключены.
+export const GA_MEASUREMENT_ID = analytics.gaId.trim();
+
+// Реквизиты компании. Пустые поля показываются в политике как [заглушка].
 export const COMPANY = {
-  name: 'NexFlow OÜ',
-  regCode: '', // регистрационный код из Äriregister
-  address: '', // юридический адрес
+  name: company.name.trim(),
+  regCode: company.regCode.trim(),
+  address: company.address.trim(),
 };

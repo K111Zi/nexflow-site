@@ -1,0 +1,113 @@
+{
+  "meta": {
+    "title": "NexFlow — websites, CRM and automation for businesses in Estonia",
+    "description": "Website development, CRM and business process automation for small and medium businesses in Estonia. All in one place."
+  },
+  "nav": {
+    "services": "Services",
+    "why": "Why us",
+    "demo": "Examples",
+    "call": "Call",
+    "contact": "Contact"
+  },
+  "cta": {
+    "lead": "Send a request",
+    "call": "Book a call"
+  },
+  "hero": {
+    "title": "Website, CRM and automation — all in one place",
+    "subtitle": "We help small and medium businesses in Estonia get more leads and spend less time on routine. We speak English, Estonian and Russian."
+  },
+  "services": {
+    "title": "Services",
+    "items": [
+      {
+        "title": "Website development",
+        "text": "Landing pages and websites with request forms, online booking and more."
+      },
+      {
+        "title": "CRM and leads",
+        "text": "Customer records, request tracking and sales automation."
+      },
+      {
+        "title": "Process automation",
+        "text": "Quotes, documents, reports, notifications and routine tasks."
+      }
+    ]
+  },
+  "why": {
+    "title": "Why NexFlow",
+    "items": [
+      {
+        "title": "One team",
+        "text": "Your website, CRM and automation work together — not through three different vendors."
+      },
+      {
+        "title": "Your language",
+        "text": "We discuss your task in English, Estonian or Russian."
+      },
+      {
+        "title": "Nothing extra",
+        "text": "We build what your business needs now and grow it as you grow."
+      }
+    ]
+  },
+  "demo": {
+    "title": "Demo projects",
+    "note": "These are demo projects that show what we can build for your business.",
+    "badge": "Demo",
+    "items": [
+      {
+        "title": "Salon website",
+        "text": "A landing page with online booking and client reminders."
+      },
+      {
+        "title": "Lead CRM",
+        "text": "Every request from the website and messengers in one table with statuses."
+      },
+      {
+        "title": "Automatic quotes",
+        "text": "A quote is put together and sent to the client in a minute."
+      }
+    ]
+  },
+  "call": {
+    "title": "Free call",
+    "text": "Pick a time that suits you — in 20 minutes we will go through your task.",
+    "button": "Pick a time"
+  },
+  "contact": {
+    "title": "Send a request",
+    "text": "Tell us what you need — we reply within one business day.",
+    "name": "Name",
+    "contact": "Phone or e-mail",
+    "task": "Task",
+    "submit": "Send request",
+    "consent": "By clicking the button, you agree to the processing of your personal data.",
+    "messengers": "Or message us:",
+    "sending": "Sending…",
+    "success": "Thank you! Your request has been sent — we will reply within one business day.",
+    "error": "Could not send your request. Please try again or message us."
+  },
+  "footer": {
+    "privacy": "Privacy policy",
+    "cookies": "Cookie settings",
+    "regCode": "Reg. code"
+  },
+  "cookie": {
+    "text": "We use Google Analytics cookies to understand how visitors use the site. They are only turned on if you agree.",
+    "accept": "Accept",
+    "decline": "Decline",
+    "more": "Learn more"
+  },
+  "legal": {
+    "back": "Back to home"
+  },
+  "themes": {
+    "label": "Theme",
+    "light": "Light",
+    "dark": "Dark",
+    "emerald": "Emerald",
+    "violet": "Violet"
+  }
+}

@@ -1,0 +1,113 @@
+{
+  "meta": {
+    "title": "NexFlow — veebilehed, CRM ja automatiseerimine Eesti ettevõtetele",
+    "description": "Veebilehtede arendus, CRM ja äriprotsesside automatiseerimine väikestele ja keskmistele ettevõtetele Eestis. Kõik ühest kohast."
+  },
+  "nav": {
+    "services": "Teenused",
+    "why": "Miks meie",
+    "demo": "Näited",
+    "call": "Kõne",
+    "contact": "Kontakt"
+  },
+  "cta": {
+    "lead": "Jäta päring",
+    "call": "Broneeri kõne"
+  },
+  "hero": {
+    "title": "Veebileht, CRM ja automatiseerimine — kõik ühest kohast",
+    "subtitle": "Aitame väikestel ja keskmistel ettevõtetel Eestis saada päringuid ja kulutada vähem aega rutiinile. Suhtleme eesti, vene ja inglise keeles."
+  },
+  "services": {
+    "title": "Teenused",
+    "items": [
+      {
+        "title": "Veebilehtede arendus",
+        "text": "Maandumislehed ja veebilehed päringuvormide, online-broneerimise ja muude funktsioonidega."
+      },
+      {
+        "title": "CRM ja päringud",
+        "text": "Klientide arvestus, pöördumiste kontroll ja müügi automatiseerimine."
+      },
+      {
+        "title": "Protsesside automatiseerimine",
+        "text": "Hinnapakkumised, dokumendid, aruanded, teavitused ja rutiinsed ülesanded."
+      }
+    ]
+  },
+  "why": {
+    "title": "Miks NexFlow",
+    "items": [
+      {
+        "title": "Üks meeskond",
+        "text": "Veebileht, CRM ja automatiseerimine töötavad koos, mitte kolme eri partneri kaudu."
+      },
+      {
+        "title": "Sinu keeles",
+        "text": "Arutame ülesannet eesti, vene või inglise keeles."
+      },
+      {
+        "title": "Ilma liigata",
+        "text": "Teeme seda, mida ettevõte praegu vajab, ja laiendame kasvades."
+      }
+    ]
+  },
+  "demo": {
+    "title": "Näidisprojektid",
+    "note": "Need on näidisprojektid: need näitavad, mida saame sinu ettevõttele teha.",
+    "badge": "Demo",
+    "items": [
+      {
+        "title": "Teenindussalongi veebileht",
+        "text": "Maandumisleht online-broneerimise ja klientide meeldetuletustega."
+      },
+      {
+        "title": "CRM päringutele",
+        "text": "Kõik päringud veebilehelt ja messengeritest ühes tabelis koos staatustega."
+      },
+      {
+        "title": "Automaatsed hinnapakkumised",
+        "text": "Hinnapakkumine koostatakse ja saadetakse kliendile minutiga."
+      }
+    ]
+  },
+  "call": {
+    "title": "Tasuta kõne",
+    "text": "Vali sobiv aeg — 20 minutiga arutame sinu ülesande läbi.",
+    "button": "Vali aeg"
+  },
+  "contact": {
+    "title": "Jäta päring",
+    "text": "Kirjuta, mida vajad — vastame ühe tööpäeva jooksul.",
+    "name": "Nimi",
+    "contact": "Telefon või e-post",
+    "task": "Ülesanne",
+    "submit": "Saada päring",
+    "consent": "Nupule vajutades nõustud isikuandmete töötlemisega.",
+    "messengers": "Või kirjuta messengeris:",
+    "sending": "Saadame…",
+    "success": "Aitäh! Päring on saadetud — vastame ühe tööpäeva jooksul.",
+    "error": "Saatmine ebaõnnestus. Proovi uuesti või kirjuta meile messengeris."
+  },
+  "footer": {
+    "privacy": "Privaatsuspoliitika",
+    "cookies": "Küpsiste seaded",
+    "regCode": "Registrikood"
+  },
+  "cookie": {
+    "text": "Kasutame Google Analyticsi küpsiseid, et mõista, kuidas külastajad veebilehte kasutavad. Need lülituvad sisse ainult sinu nõusolekul.",
+    "accept": "Nõustun",
+    "decline": "Keeldun",
+    "more": "Loe lähemalt"
+  },
+  "legal": {
+    "back": "Avalehele"
+  },
+  "themes": {
+    "label": "Teema",
+    "light": "Hele",
+    "dark": "Tume",
+    "emerald": "Smaragd",
+    "violet": "Violetne"
+  }
+}

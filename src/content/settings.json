@@ -1,0 +1,16 @@
+{
+  "contacts": {
+    "whatsapp": "",
+    "telegram": "",
+    "bookingUrl": "",
+    "email": ""
+  },
+  "company": {
+    "name": "NexFlow OÜ",
+    "regCode": "",
+    "address": ""
+  },
+  "analytics": {
+    "gaId": ""
+  }
+}
