@@ -14,7 +14,11 @@ export default defineConfig({
     defaultLocale: 'et',
     locales: ['et', 'ru', 'en'],
     routing: {
-      prefixDefaultLocale: false, // эстонский — на "/", русский — на "/ru/", английский — на "/en/"
+      prefixDefaultLocale: true, // все языки с приставкой: /et/, /ru/, /en/
     },
+  },
+  // Главный адрес ведёт на эстонскую версию (на Netlify — настоящий редирект 301).
+  redirects: {
+    '/': '/et/',
   },
 });

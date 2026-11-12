@@ -21,13 +21,13 @@ export const languageNames: Record<Lang, string> = {
 };
 
 export const langPath: Record<Lang, string> = {
-  et: '/',
+  et: '/et/',
   ru: '/ru/',
   en: '/en/',
 };
 
 export const privacyPath: Record<Lang, string> = {
-  et: '/privacy/',
+  et: '/et/privacy/',
   ru: '/ru/privacy/',
   en: '/en/privacy/',
 };

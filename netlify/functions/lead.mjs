@@ -5,7 +5,7 @@
 //   TELEGRAM_CHAT_ID   — куда бот пишет заявки (ваш чат или группа)
 
 const LIMITS = { name: 100, contact: 150, task: 2000 };
-const LANG_PATHS = { et: '/', ru: '/ru/', en: '/en/' };
+const LANG_PATHS = { et: '/et/', ru: '/ru/', en: '/en/' };
 
 const escapeHtml = (s) => s.replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' })[c]);
 
