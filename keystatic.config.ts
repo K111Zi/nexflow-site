@@ -1,6 +1,7 @@
-// Админка сайта (Keystatic): http://localhost:4321/keystatic при `npm run dev`.
-// Сейчас сохраняет файлы на этом компьютере. После публикации переключим на GitHub —
-// тогда редактировать можно будет прямо на сайте, а каждое сохранение станет коммитом.
+// Админка сайта (Keystatic): <адрес сайта>/keystatic, вход через GitHub.
+// Каждое сохранение — коммит в репозиторий K111Zi/nexflow-site, после чего Netlify обновляет сайт.
+// Ключи GitHub App: KEYSTATIC_GITHUB_CLIENT_ID, KEYSTATIC_GITHUB_CLIENT_SECRET, KEYSTATIC_SECRET,
+// PUBLIC_KEYSTATIC_GITHUB_APP_SLUG — в .env (локально) и в переменных окружения Netlify.
 
 import { config, fields, singleton } from '@keystatic/core';
 
@@ -123,7 +124,7 @@ const site = (lang: string, label: string) =>
   });
 
 export default config({
-  storage: { kind: 'local' },
+  storage: { kind: 'github', repo: 'K111Zi/nexflow-site' },
   ui: {
     brand: { name: 'NexFlow' },
     navigation: {

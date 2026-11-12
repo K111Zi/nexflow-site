@@ -5,8 +5,8 @@ import react from '@astrojs/react';
 import keystatic from '@keystatic/astro';
 
 export default defineConfig({
-  // Адрес сайта — для SEO-ссылок и sitemap. Поменяйте, когда купите домен.
-  site: 'https://nexflow.ee',
+  // Адрес сайта — для SEO-ссылок и sitemap. Пока адрес Netlify; поменяйте, когда купите домен.
+  site: 'https://creative-sunshine-6d5e20.netlify.app',
   // Страницы сайта остаются статичными; сервер нужен только админке (/keystatic).
   adapter: netlify(),
   integrations: [react(), keystatic()],

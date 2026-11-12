@@ -26,10 +26,10 @@
 ## Стек и структура
 
 - **Astro 7**, Node.js 26 LTS, git. Страницы статичные; адаптер **Netlify** нужен только для админки. Хостинг — **Netlify** (`netlify.toml`, Node 24 на сборке).
-- i18n Astro с `prefixDefaultLocale: true`; редирект `/` → `/et/` в `astro.config.mjs` (`redirects`). Там же `site` — **`https://nexflow.ee` (предположение, домена ещё нет)**.
+- i18n Astro с `prefixDefaultLocale: true`; редирект `/` → `/et/` в `astro.config.mjs` (`redirects`). Там же `site` — **`https://creative-sunshine-6d5e20.netlify.app`** (адрес Netlify до покупки домена). `nexflow.netlify.app` — чужой сайт: есть другая компания «NexFlow — AI Automation Agency»; до покупки домена проверить `nexflow.ee` и товарный знак.
 - **Тексты** — `src/content/site/{et,ru,en}.json` (редактируются в админке). `src/i18n/ui.ts` — языки, пути (`langPath`, `privacyPath`), тип `Dict` и сборка `ui` из JSON. Эстонский — черновик, нужна проверка носителем.
 - **Настройки** — `src/content/settings.json`: WhatsApp (номер), Telegram (@имя), ссылка записи, e-mail, реквизиты компании, ID Google Analytics. `src/config.ts` читает его и собирает ссылки (пусто → `#`).
-- **Админка Keystatic** — `keystatic.config.ts`, адрес `/keystatic`. Сейчас `storage: local` (правит файлы на этом компьютере); после появления GitHub-репозитория переключить на `github`.
+- **Админка Keystatic** — `keystatic.config.ts`, адрес `/keystatic`, `storage: github` (`K111Zi/nexflow-site`): вход через GitHub, сохранение = коммит в `main` → Netlify пересобирает сайт. После правок в админке делать `git pull`. Ключи GitHub App (`KEYSTATIC_*`, `PUBLIC_KEYSTATIC_GITHUB_APP_SLUG`) — в `.env` и в Netlify.
 - **Форма заявки** — `netlify/functions/lead.mjs` на `/api/lead`: проверка полей, ловушка для ботов (`website`), отправка в **Telegram**. Секреты `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID` — в `.env` (локально, не в git) и в переменных окружения Netlify. Образец — `.env.example`. Сейчас подключён **тестовый бот**, заявки идут в личный чат владельца (ID — в `.env`).
 - `src/components/Landing.astro` — главная страница + скрипты тем, меню, отправки формы и событий аналитики (`generate_lead`, `contact_click`, `book_call_click`).
 - `src/components/Privacy.astro` + `src/i18n/privacy.ts` — политика конфиденциальности (шаблон GDPR, 3 языка, текст в коде). Пустые реквизиты показываются как `[reg. code]` и т. п.
@@ -47,12 +47,13 @@
 ## Окружение
 
 - Windows 11, PowerShell 5.1. **Smart App Control выключен** пользователем (блокировал нативный модуль Astro).
-- Git: имя/e-mail прописаны только локально. Удалённого репозитория (GitHub) пока нет. Техническая работа идёт в ветке **`tech-setup`**, перед публикацией влить в `main`.
+- Git: имя/e-mail прописаны только локально. Репозиторий **https://github.com/K111Zi/nexflow-site** (private), `origin`, ветка `main` публикуется на Netlify автоматически. Вход GitHub сохранён в Git Credential Manager (первый вход делали в отдельном окне PowerShell — из сессии Claude окно входа не открывается).
+- Сайт: **https://creative-sunshine-6d5e20.netlify.app**
 - Проверять редиректы через `curl.exe` (Invoke-WebRequest в PS 5.1 падает на 301).
 
 ## Что дальше
 
-1. **Публикация:** аккаунты GitHub и Netlify → репозиторий, влить `tech-setup` в `main`, подключить Netlify, задать переменные Telegram, переключить Keystatic на `github`.
+1. **Публикация:** сделано (GitHub + Netlify). Проверить переменные Telegram в Netlify (тест с сайта вернул `not_configured`), настроить GitHub App для Keystatic.
 2. Заполнить в админке **настройки**: WhatsApp, Telegram, Cal.com, e-mail, реквизиты OÜ (зарегистрирована ли компания — не уточнено), GA ID.
 3. Завести **настоящего бота NexFlow** вместо тестового (токен тестового светился в чате).
 4. Домен (напр. `nexflow.ee`) → обновить `site` в `astro.config.mjs`.
