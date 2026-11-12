@@ -1,0 +1,105 @@
+---
+import Lines from '../Lines.astro';
+import DemoCard from '../DemoCard.astro';
+import Cta from '../Cta.astro';
+import { ui, pagePath, demoKeys, type Lang } from '../../i18n/ui';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = ui[lang].home;
+const num = (i: number) => String(i + 1).padStart(2, '0');
+---
+
+<div class="container">
+  <section class="hero">
+    <div>
+      <div class="eyebrow">{t.eyebrow}</div>
+      <h1 class="display"><Lines text={t.heading} /></h1>
+      <p class="lead">{t.lead}</p>
+      <div class="hero-actions">
+        <a href={pagePath(lang, 'contact')} class="btn">{t.ctaPrimary} <span class="arrow">→</span></a>
+        <a href={pagePath(lang, 'solutions')} class="btn-text">{t.ctaSecondary} <span class="arrow">↗</span></a>
+      </div>
+    </div>
+    <div class="hero-art">
+      <div class="orb-stage">
+        <div class="bubble"><Lines text={t.bubble} /></div>
+        <span class="orb"><img src="/images/robot.png" alt={t.robotAlt} width="310" height="310" fetchpriority="high" /></span>
+      </div>
+    </div>
+  </section>
+
+  <div class="service-strip">
+    {
+      t.services.map((s, i) => (
+        <a class="service-tile" href={pagePath(lang, 'solutions')}>
+          <span class="label-num">{num(i)} /</span>
+          <strong>{s.title}</strong>
+          <span class="desc">{s.text}</span>
+          <span class="service-arrow" aria-hidden="true">→</span>
+        </a>
+      ))
+    }
+  </div>
+</div>
+
+<section class="section container topline">
+  <div class="eyebrow muted">{t.problemsEyebrow}</div>
+  <div class="headrow">
+    <h2 class="section-title"><Lines text={t.problemsTitle} /></h2>
+    <p>{t.problemsLead}</p>
+  </div>
+  <div class="problems-grid">
+    {
+      t.problems.map((p, i) => (
+        <div class="problem">
+          <span class="label-num">{num(i)}</span>
+          <div>
+            <strong>{p.title}</strong>
+            <p>{p.text}</p>
+          </div>
+        </div>
+      ))
+    }
+  </div>
+</section>
+
+<section class="section black-panel">
+  <div class="container">
+    <div class="eyebrow">{t.approachEyebrow}</div>
+    <div class="headrow">
+      <h2 class="section-title"><Lines text={t.approachTitle} /></h2>
+      <p>{t.approachLead}</p>
+    </div>
+    <div class="process-grid">
+      {
+        t.approach.map((a) => (
+          <div class="process-col">
+            <span>{a.label}</span>
+            <h3>{a.title}</h3>
+            <p>{a.text}</p>
+          </div>
+        ))
+      }
+    </div>
+    <div style="margin-top:42px">
+      <a href={pagePath(lang, 'process')} class="btn btn-invert">{t.approachCta} <span class="arrow">↗</span></a>
+    </div>
+  </div>
+</section>
+
+<section class="section container">
+  <div class="eyebrow muted">{t.demosEyebrow}</div>
+  <div class="headrow">
+    <h2 class="section-title"><Lines text={t.demosTitle} /></h2>
+    <p>{t.demosLead}</p>
+  </div>
+  <div class="project-grid">
+    {demoKeys.map((k) => <DemoCard lang={lang} demo={k} />)}
+  </div>
+</section>
+
+<Cta lang={lang} />

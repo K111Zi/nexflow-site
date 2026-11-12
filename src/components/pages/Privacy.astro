@@ -1,0 +1,39 @@
+---
+import PageIntro from '../PageIntro.astro';
+import { ui, type Lang } from '../../i18n/ui';
+import { privacy, PRIVACY_UPDATED } from '../../i18n/privacy';
+import { CONTACT_EMAIL, COMPANY } from '../../config';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const p = privacy[lang];
+
+// Пустые реквизиты показываем как [заглушку], чтобы их было видно до запуска.
+const values: Record<string, string> = {
+  company: COMPANY.name || '[company]',
+  regCode: COMPANY.regCode || '[reg. code]',
+  address: COMPANY.address || '[address]',
+  email: CONTACT_EMAIL || '[e-mail]',
+};
+const fill = (s: string) => s.replace(/\{(\w+)\}/g, (_, k) => values[k] ?? `{${k}}`);
+const updated = new Date(PRIVACY_UPDATED).toLocaleDateString(lang, { day: 'numeric', month: 'long', year: 'numeric' });
+---
+
+<PageIntro eyebrow={ui[lang].legal.eyebrow} heading={p.title} lead={p.description} />
+
+<article class="container policy">
+  <p class="note">{p.updated}: <time datetime={PRIVACY_UPDATED}>{updated}</time></p>
+  {
+    p.sections.map((s) => (
+      <section>
+        <h2>{s.title}</h2>
+        {s.paragraphs.map((text) => (
+          <p>{fill(text)}</p>
+        ))}
+      </section>
+    ))
+  }
+</article>

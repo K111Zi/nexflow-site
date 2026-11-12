@@ -4,7 +4,7 @@
 //   TELEGRAM_BOT_TOKEN — токен бота от @BotFather
 //   TELEGRAM_CHAT_ID   — куда бот пишет заявки (ваш чат или группа)
 
-const LIMITS = { name: 100, contact: 150, task: 2000 };
+const LIMITS = { name: 100, company: 120, contact: 160, interest: 80, task: 2200 };
 const LANG_PATHS = { et: '/et/', ru: '/ru/', en: '/en/' };
 
 const escapeHtml = (s) => s.replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' })[c]);
@@ -40,14 +40,19 @@ export default async (req) => {
   // Ловушка для спам-ботов: это поле скрыто от людей, боты его заполняют.
   if (field('website')) return reply(200);
 
-  const name = field('name');
-  const contact = field('contact');
-  const task = field('task');
+  const data = {
+    name: field('name'),
+    company: field('company'),
+    contact: field('contact'),
+    interest: field('interest'),
+    task: field('task'),
+  };
 
-  if (!name || !contact) return reply(400, 'required');
-  if (name.length > LIMITS.name || contact.length > LIMITS.contact || task.length > LIMITS.task) {
-    return reply(400, 'too_long');
-  }
+  if (!data.name || !data.contact || !data.task) return reply(400, 'required');
+  if (!form.get('consent')) return reply(400, 'consent');
+  if (Object.entries(LIMITS).some(([key, max]) => data[key].length > max)) return reply(400, 'too_long');
+
+  const { name, company, contact, interest, task } = data;
 
   const token = process.env.TELEGRAM_BOT_TOKEN;
   const chatId = process.env.TELEGRAM_CHAT_ID;
@@ -57,10 +62,12 @@ export default async (req) => {
   }
 
   const text = [
-    `<b>Новая заявка с сайта</b> (${lang.toUpperCase()})`,
+    `<b>Новая заявка с сайта NQO</b> (${lang.toUpperCase()})`,
     `<b>Имя:</b> ${escapeHtml(name)}`,
+    company && `<b>Компания:</b> ${escapeHtml(company)}`,
     `<b>Контакт:</b> ${escapeHtml(contact)}`,
-    task && `<b>Задача:</b>\n${escapeHtml(task)}`,
+    interest && `<b>Интерес:</b> ${escapeHtml(interest)}`,
+    `<b>Задача:</b>\n${escapeHtml(task)}`,
   ]
     .filter(Boolean)
     .join('\n');

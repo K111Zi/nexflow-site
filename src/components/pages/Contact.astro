@@ -1,0 +1,156 @@
+---
+import Lines from '../Lines.astro';
+import { ui, pagePath, type Lang } from '../../i18n/ui';
+import { FORM_ENDPOINT, BOOKING_URL, WHATSAPP_URL, TELEGRAM_URL, CONTACT_EMAIL } from '../../config';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = ui[lang].contact;
+
+// Кнопки связи показываем, только если в настройках указаны настоящие ссылки.
+const channels = [
+  { href: WHATSAPP_URL, label: 'WhatsApp', track: 'whatsapp' },
+  { href: TELEGRAM_URL, label: 'Telegram', track: 'telegram' },
+  { href: BOOKING_URL, label: t.bookCall, track: 'booking' },
+  { href: CONTACT_EMAIL ? `mailto:${CONTACT_EMAIL}` : '#', label: CONTACT_EMAIL, track: 'email' },
+].filter((c) => c.href !== '#');
+---
+
+<section class="contact-grid container">
+  <div>
+    <div class="eyebrow muted">{t.eyebrow}</div>
+    <h1><Lines text={t.heading} /></h1>
+    <p class="lead">{t.lead}</p>
+    <div class="contact-support">
+      <b>{t.howTitle}</b>
+      <p>{t.howText}</p>
+      {
+        channels.length > 0 && (
+          <>
+            <b>{t.channelsTitle}</b>
+            <div class="contact-channels">
+              {channels.map((c) => (
+                <a class="btn btn-light" href={c.href} target={c.track === 'email' ? undefined : '_blank'} rel="noopener" data-track={c.track}>
+                  {c.label}
+                </a>
+              ))}
+            </div>
+          </>
+        )
+      }
+    </div>
+  </div>
+
+  <div class="form-card">
+    <div class="eyebrow">{t.formEyebrow}</div>
+    <h2>{t.formTitle}</h2>
+    <form
+      id="lead-form"
+      method="POST"
+      action={FORM_ENDPOINT}
+      novalidate
+      data-msg-sending={t.sending}
+      data-msg-success={t.success}
+      data-msg-error={t.error}
+      data-msg-invalid={t.invalid}
+    >
+      <input type="hidden" name="lang" value={lang} />
+      <div class="form__trap" aria-hidden="true">
+        <label>Website <input type="text" name="website" tabindex="-1" autocomplete="off" /></label>
+      </div>
+      <div class="field">
+        <label for="f-name">{t.name}</label>
+        <input id="f-name" name="name" autocomplete="name" placeholder={t.namePlaceholder} required maxlength="100" />
+      </div>
+      <div class="field">
+        <label for="f-company">{t.company}</label>
+        <input id="f-company" name="company" autocomplete="organization" placeholder={t.companyPlaceholder} maxlength="120" />
+      </div>
+      <div class="field">
+        <label for="f-contact">{t.contact}</label>
+        <input id="f-contact" name="contact" autocomplete="email" placeholder={t.contactPlaceholder} required maxlength="160" />
+      </div>
+      <div class="field">
+        <label for="f-interest">{t.interest}</label>
+        <select id="f-interest" name="interest">
+          <option value="">{t.interestPlaceholder}</option>
+          {t.interestOptions.map((o) => <option>{o}</option>)}
+        </select>
+      </div>
+      <div class="field">
+        <label for="f-task">{t.task}</label>
+        <textarea id="f-task" name="task" placeholder={t.taskPlaceholder} required maxlength="2200"></textarea>
+      </div>
+      <label class="check">
+        <input type="checkbox" name="consent" required />
+        <span>{t.consentBefore} <a href={pagePath(lang, 'privacy')} class="underlined">{t.consentLink}</a>.</span>
+      </label>
+      <button class="btn" type="submit">{t.submit} <span class="arrow">→</span></button>
+      <p class="form__status" role="status" aria-live="polite"></p>
+    </form>
+  </div>
+</section>
+
+<script>
+  // События Google Analytics (работают, только если аналитика включена и есть согласие).
+  const track = (name: string, params: Record<string, string> = {}) => (window as any).gtag?.('event', name, params);
+
+  document.querySelectorAll<HTMLElement>('[data-track]').forEach((el) =>
+    el.addEventListener('click', () =>
+      el.dataset.track === 'booking' ? track('book_call_click') : track('contact_click', { method: el.dataset.track! }),
+    ),
+  );
+
+  const form = document.querySelector<HTMLFormElement>('#lead-form');
+  if (form) {
+    const status = form.querySelector<HTMLElement>('.form__status')!;
+    const submit = form.querySelector<HTMLButtonElement>('button[type="submit"]')!;
+    const messages: Record<string, string | undefined> = {
+      sending: form.dataset.msgSending,
+      success: form.dataset.msgSuccess,
+      error: form.dataset.msgError,
+      invalid: form.dataset.msgInvalid,
+    };
+    const show = (kind: 'sending' | 'success' | 'error' | 'invalid') => {
+      status.textContent = messages[kind] || '';
+      status.className = `form__status form__status--${kind}`;
+    };
+
+    // Возврат после отправки без JavaScript: ?lead=sent или ?lead=error.
+    const result = new URLSearchParams(location.search).get('lead');
+    if (result === 'sent' || result === 'error') {
+      show(result === 'sent' ? 'success' : 'error');
+      history.replaceState(null, '', location.pathname + location.hash);
+    }
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!form.checkValidity()) {
+        show('invalid');
+        form.querySelector<HTMLElement>(':invalid')?.focus();
+        return;
+      }
+      submit.disabled = true;
+      show('sending');
+      try {
+        const res = await fetch(form.action, {
+          method: 'POST',
+          body: new FormData(form),
+          headers: { Accept: 'application/json' },
+        });
+        const data = await res.json().catch(() => null);
+        if (!res.ok || !data?.ok) throw new Error(data?.error || `HTTP ${res.status}`);
+        form.reset();
+        show('success');
+        track('generate_lead', { form: 'contact' });
+      } catch {
+        show('error');
+      } finally {
+        submit.disabled = false;
+      }
+    });
+  }
+</script>

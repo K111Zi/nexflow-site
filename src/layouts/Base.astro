@@ -1,20 +1,22 @@
 ---
 import '../styles/global.css';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import Helper from '../components/Helper.astro';
+import DemoModal from '../components/DemoModal.astro';
 import CookieBanner from '../components/CookieBanner.astro';
-import type { Lang } from '../i18n/ui';
+import { pageAlternates, pagePath, type Lang, type PageKey } from '../i18n/ui';
 import { GA_MEASUREMENT_ID } from '../config';
 
 interface Props {
   lang: Lang;
+  page: PageKey;
   title: string;
   description: string;
-  /** Адрес этой страницы, например "/ru/". */
-  path: string;
-  /** Адреса этой же страницы на всех языках — для hreflang. */
-  alternates: Record<Lang, string>;
 }
 
-const { lang, title, description, path, alternates } = Astro.props;
+const { lang, page, title, description } = Astro.props;
+const alternates = pageAlternates(page);
 const abs = (p: string) => new URL(p, Astro.site).href;
 const ogLocale: Record<Lang, string> = { et: 'et_EE', ru: 'ru_RU', en: 'en_US' };
 ---
@@ -24,32 +26,34 @@ const ogLocale: Record<Lang, string> = { et: 'et_EE', ru: 'ru_RU', en: 'en_US' }
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#f8f8f6" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0f0f0f" media="(prefers-color-scheme: dark)" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <title>{title}</title>
     <meta name="description" content={description} />
-    <link rel="canonical" href={abs(path)} />
+    <link rel="canonical" href={abs(pagePath(lang, page))} />
     {(Object.keys(alternates) as Lang[]).map((l) => <link rel="alternate" hreflang={l} href={abs(alternates[l])} />)}
     <link rel="alternate" hreflang="x-default" href={abs(alternates.et)} />
     <link rel="sitemap" href="/sitemap.xml" />
 
     <meta property="og:type" content="website" />
-    <meta property="og:site_name" content="NexFlow" />
+    <meta property="og:site_name" content="NQO" />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
-    <meta property="og:url" content={abs(path)} />
+    <meta property="og:url" content={abs(pagePath(lang, page))} />
     <meta property="og:locale" content={ogLocale[lang]} />
+    <meta property="og:image" content={abs('/images/robot.png')} />
     <meta name="twitter:card" content="summary" />
 
     <script is:inline>
-      // Включаем тему до отрисовки страницы, чтобы не было «мигания».
+      // Тема до отрисовки страницы, чтобы не было «мигания»: сохранённая или по настройке устройства.
       (function () {
-        var themes = ['light', 'dark', 'emerald', 'violet'];
         var saved = null;
         try {
           saved = localStorage.getItem('theme');
         } catch (e) {}
         var theme =
-          themes.indexOf(saved) !== -1
+          saved === 'light' || saved === 'dark'
             ? saved
             : window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
               ? 'dark'
@@ -59,7 +63,13 @@ const ogLocale: Record<Lang, string> = { et: 'et_EE', ru: 'ru_RU', en: 'en_US' }
     </script>
   </head>
   <body>
-    <slot />
+    <Header lang={lang} page={page} />
+    <main id="main">
+      <slot />
+    </main>
+    <Footer lang={lang} />
+    <Helper lang={lang} />
+    <DemoModal lang={lang} />
     {GA_MEASUREMENT_ID && <CookieBanner lang={lang} gaId={GA_MEASUREMENT_ID} />}
   </body>
 </html>

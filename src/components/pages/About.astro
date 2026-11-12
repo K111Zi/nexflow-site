@@ -1,0 +1,41 @@
+---
+import PageIntro from '../PageIntro.astro';
+import Lines from '../Lines.astro';
+import Cta from '../Cta.astro';
+import { ui, type Lang } from '../../i18n/ui';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = ui[lang].about;
+const num = (i: number) => String(i + 1).padStart(2, '0');
+---
+
+<PageIntro eyebrow={t.eyebrow} heading={t.heading} lead={t.lead} aside={t.aside} />
+
+<section class="container">
+  <div class="about-word" aria-hidden="true">{t.word}</div>
+  <div class="about-tag">{t.tagline.map((w) => <span>{w}</span>)}</div>
+</section>
+
+<section class="section container">
+  <div class="eyebrow muted">{t.valuesEyebrow}</div>
+  <h2 class="section-title" style="margin:25px 0 0"><Lines text={t.valuesTitle} /></h2>
+  <div class="principle-grid">
+    {
+      t.values.map((v, i) => (
+        <div class="principle">
+          <span class="label-num">{num(i)} /</span>
+          <strong>{v.title}</strong>
+          <p>{v.text}</p>
+        </div>
+      ))
+    }
+  </div>
+  <div class="section-note" style="margin-top:30px">{t.note}</div>
+</section>
+
+<div style="height:30px"></div>
+<Cta lang={lang} />

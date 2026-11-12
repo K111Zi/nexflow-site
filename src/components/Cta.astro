@@ -1,0 +1,21 @@
+---
+import Lines from './Lines.astro';
+import { ui, pagePath, type Lang } from '../i18n/ui';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = ui[lang].cta;
+---
+
+<div class="container">
+  <div class="cta-large">
+    <div>
+      <h2><Lines text={t.title} /></h2>
+      <p>{t.text}</p>
+    </div>
+    <a href={pagePath(lang, 'contact')} class="btn">{t.button} <span class="arrow">↗</span></a>
+  </div>
+</div>

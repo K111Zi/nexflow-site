@@ -1,0 +1,49 @@
+---
+import PageIntro from '../PageIntro.astro';
+import Cta from '../Cta.astro';
+import { ui, demoKeys, type Lang } from '../../i18n/ui';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = ui[lang].solutions;
+const num = (i: number) => String(i + 1).padStart(2, '0');
+---
+
+<PageIntro eyebrow={t.eyebrow} heading={t.heading} lead={t.lead} aside={t.aside} />
+
+<section class="container">
+  {
+    t.groups.map((g, i) => (
+      <div class="solution-block" style={i === 0 ? 'border-top:0' : undefined}>
+        <div class="solution-left">
+          <div class="eyebrow">
+            {num(i)} / {t.groupEyebrow}
+          </div>
+          <h2>{g.title}</h2>
+          <p>{g.text}</p>
+          {demoKeys[i] && (
+            <button type="button" class="btn-text" data-demo={demoKeys[i]}>
+              {t.exampleLink} <span class="arrow">↗</span>
+            </button>
+          )}
+        </div>
+        <div class="solution-right">
+          {g.items.map((item) => (
+            <div class="detail-box">
+              <div class="label-num">↗</div>
+              <h3>{item.title}</h3>
+              <p>{item.text}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    ))
+  }
+  <div class="section-note"><b>{t.noteTitle}</b> {t.note}</div>
+</section>
+
+<div style="height:110px"></div>
+<Cta lang={lang} />

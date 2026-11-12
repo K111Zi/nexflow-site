@@ -1,5 +1,6 @@
 ---
-import { ui, privacyPath, type Lang } from '../i18n/ui';
+import Lines from './Lines.astro';
+import { ui, pagePath, type Lang } from '../i18n/ui';
 import { CONTACT_EMAIL, COMPANY } from '../config';
 
 interface Props {
@@ -7,19 +8,30 @@ interface Props {
 }
 
 const { lang } = Astro.props;
-const t = ui[lang].footer;
+const t = ui[lang];
 const year = new Date().getFullYear();
+const links = ['home', 'solutions', 'process', 'projects', 'about', 'contact'] as const;
 ---
 
 <footer class="footer">
-  <div class="container footer__inner">
-    <span>
-      © {year} {COMPANY.name}{COMPANY.regCode && ` · ${t.regCode} ${COMPANY.regCode}`}
-    </span>
-    {CONTACT_EMAIL && <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>}
-    <span class="footer__links">
-      <a href={privacyPath[lang]}>{t.privacy}</a>
-      <button type="button" class="footer__link-btn" data-cookie-settings hidden>{t.cookies}</button>
-    </span>
+  <div class="container">
+    <div class="footer-top">
+      <div>
+        <div class="eyebrow">{t.footer.eyebrow}</div>
+        <h2 class="footer-title"><Lines text={t.footer.title} /></h2>
+        <a href={pagePath(lang, 'contact')} class="btn">{t.footer.button} <span class="arrow">↗</span></a>
+      </div>
+      <nav class="footer-links" aria-label={t.ui.footerNav}>
+        {links.map((p) => <a href={pagePath(lang, p)}>{t.nav[p]}</a>)}
+        <a href={pagePath(lang, 'privacy')}>{t.footer.privacy}</a>
+        <button type="button" data-cookie-settings hidden>{t.footer.cookies}</button>
+      </nav>
+    </div>
+    <div class="footer-bottom">
+      <span>© {year} {COMPANY.name}{COMPANY.regCode && ` · ${t.footer.regCode} ${COMPANY.regCode}`}</span>
+      {CONTACT_EMAIL && <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>}
+      <span>{t.footer.tagline}</span>
+      <span>{t.footer.motto}</span>
+    </div>
   </div>
 </footer>

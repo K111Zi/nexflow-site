@@ -1,0 +1,123 @@
+---
+import Logo from './Logo.astro';
+import { ui, languages, languageNames, langs, pagePath, type Lang, type PageKey } from '../i18n/ui';
+
+interface Props {
+  lang: Lang;
+  page: PageKey;
+}
+
+const { lang, page } = Astro.props;
+const t = ui[lang];
+const navPages = ['solutions', 'process', 'projects', 'about'] as const;
+---
+
+<header class="header">
+  <div class="container header-in">
+    <a href={pagePath(lang, 'home')} class="brand" aria-label="NQO"><Logo /><span>NQO</span></a>
+
+    <nav class="main-nav" id="nav" aria-label={t.ui.mainNav}>
+      {
+        navPages.map((p) => (
+          <a href={pagePath(lang, p)} aria-current={p === page ? 'page' : undefined}>
+            {t.nav[p]}
+          </a>
+        ))
+      }
+    </nav>
+
+    <div class="header-tools">
+      <div class="dropdown">
+        <button type="button" class="dropdown__toggle" aria-haspopup="true" aria-expanded="false" aria-label={t.ui.language}>
+          {languages[lang]}<span class="dropdown__caret" aria-hidden="true">▾</span>
+        </button>
+        <div class="dropdown__menu">
+          {
+            langs.map((l) => (
+              <a href={pagePath(l, page)} class="dropdown__item" hreflang={l} lang={l} aria-current={l === lang ? 'page' : undefined}>
+                <span class="dropdown__code">{languages[l]}</span>
+                {languageNames[l]}
+              </a>
+            ))
+          }
+        </div>
+      </div>
+
+      <button
+        type="button"
+        class="icon-btn theme-toggle"
+        data-label-light={t.ui.themeToLight}
+        data-label-dark={t.ui.themeToDark}
+        aria-label={t.ui.themeToDark}
+      >
+        <span class="icon-moon" aria-hidden="true">☾</span><span class="icon-sun" aria-hidden="true">☀</span>
+      </button>
+
+      <button
+        type="button"
+        class="icon-btn menu-toggle"
+        aria-controls="nav"
+        aria-expanded="false"
+        aria-label={t.ui.menuOpen}
+        data-label-open={t.ui.menuOpen}
+        data-label-close={t.ui.menuClose}>☰</button
+      >
+    </div>
+
+    <a class="header-cta" href={pagePath(lang, 'contact')}>{t.nav.cta} <span class="arrow">→</span></a>
+  </div>
+</header>
+
+<script>
+  const root = document.documentElement;
+
+  // Тема: светлая ↔ тёмная, выбор запоминается.
+  const themeBtn = document.querySelector<HTMLButtonElement>('.theme-toggle');
+  const syncThemeLabel = () => {
+    if (!themeBtn) return;
+    const dark = root.dataset.theme === 'dark';
+    themeBtn.setAttribute('aria-label', (dark ? themeBtn.dataset.labelLight : themeBtn.dataset.labelDark) || '');
+  };
+  syncThemeLabel();
+  themeBtn?.addEventListener('click', () => {
+    const next = root.dataset.theme === 'dark' ? 'light' : 'dark';
+    root.dataset.theme = next;
+    try {
+      localStorage.setItem('theme', next);
+    } catch {}
+    syncThemeLabel();
+  });
+
+  // Меню на телефоне.
+  const nav = document.getElementById('nav');
+  const menuBtn = document.querySelector<HTMLButtonElement>('.menu-toggle');
+  const setMenu = (open: boolean) => {
+    nav?.classList.toggle('open', open);
+    if (!menuBtn) return;
+    menuBtn.setAttribute('aria-expanded', String(open));
+    menuBtn.setAttribute('aria-label', (open ? menuBtn.dataset.labelClose : menuBtn.dataset.labelOpen) || '');
+    menuBtn.textContent = open ? '×' : '☰';
+  };
+  menuBtn?.addEventListener('click', () => setMenu(!nav?.classList.contains('open')));
+
+  // Меню языка: наведение (CSS) на компьютере, нажатие на телефоне и с клавиатуры.
+  const dropdown = document.querySelector<HTMLElement>('.dropdown');
+  const ddToggle = dropdown?.querySelector<HTMLButtonElement>('.dropdown__toggle');
+  const setDropdown = (open: boolean) => {
+    dropdown?.classList.toggle('open', open);
+    ddToggle?.setAttribute('aria-expanded', String(open));
+  };
+  ddToggle?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    setDropdown(!dropdown?.classList.contains('open'));
+  });
+  document.addEventListener('click', (e) => {
+    if (!(e.target as HTMLElement).closest('.dropdown')) setDropdown(false);
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      setDropdown(false);
+      setMenu(false);
+    }
+  });
+</script>

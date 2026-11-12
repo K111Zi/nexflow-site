@@ -1,0 +1,10 @@
+---
+// Выводит текст с переносами строк (\n из админки) через <br />.
+interface Props {
+  text: string;
+}
+
+const parts = Astro.props.text.split('\n');
+---
+
+{parts.map((p, i) => (i > 0 ? [<br />, p] : p))}

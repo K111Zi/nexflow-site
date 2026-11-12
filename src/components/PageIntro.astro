@@ -1,0 +1,23 @@
+---
+import Lines from './Lines.astro';
+
+interface Props {
+  eyebrow: string;
+  heading: string;
+  lead: string;
+  aside?: string;
+}
+
+const { eyebrow, heading, lead, aside } = Astro.props;
+---
+
+<section class="page-intro container">
+  <div class="eyebrow">{eyebrow}</div>
+  <div class="page-intro-inner">
+    <div>
+      <h1 class="page-heading"><Lines text={heading} /></h1>
+      <p class="lead">{lead}</p>
+    </div>
+    {aside && <div class="page-intro-aside">{aside}</div>}
+  </div>
+</section>

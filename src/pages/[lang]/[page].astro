@@ -1,0 +1,38 @@
+---
+// Внутренние страницы на каждом языке: /ru/solutions/, /ru/process/ и т. д.
+import Base from '../../layouts/Base.astro';
+import Solutions from '../../components/pages/Solutions.astro';
+import Process from '../../components/pages/Process.astro';
+import Projects from '../../components/pages/Projects.astro';
+import About from '../../components/pages/About.astro';
+import Contact from '../../components/pages/Contact.astro';
+import Privacy from '../../components/pages/Privacy.astro';
+import { ui, langs, pageKeys, type Lang, type PageKey } from '../../i18n/ui';
+import { privacy } from '../../i18n/privacy';
+
+export function getStaticPaths() {
+  return langs.flatMap((lang) => pageKeys.filter((page) => page !== 'home').map((page) => ({ params: { lang, page } })));
+}
+
+const lang = Astro.params.lang as Lang;
+const page = Astro.params.page as Exclude<PageKey, 'home'>;
+const t = ui[lang];
+
+const meta: Record<typeof page, { title: string; description: string }> = {
+  solutions: t.solutions,
+  process: t.process,
+  projects: t.projects,
+  about: t.about,
+  contact: t.contact,
+  privacy: { title: `${privacy[lang].title} — NQO`, description: privacy[lang].description },
+};
+---
+
+<Base lang={lang} page={page} title={meta[page].title} description={meta[page].description}>
+  {page === 'solutions' && <Solutions lang={lang} />}
+  {page === 'process' && <Process lang={lang} />}
+  {page === 'projects' && <Projects lang={lang} />}
+  {page === 'about' && <About lang={lang} />}
+  {page === 'contact' && <Contact lang={lang} />}
+  {page === 'privacy' && <Privacy lang={lang} />}
+</Base>

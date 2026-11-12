@@ -1,0 +1,63 @@
+---
+// Карточка демо-сценария с условной иллюстрацией. Кнопка открывает пошаговое окно (DemoModal).
+import { ui, type Lang, type DemoKey } from '../i18n/ui';
+
+interface Props {
+  lang: Lang;
+  demo: DemoKey;
+}
+
+const { lang, demo } = Astro.props;
+const t = ui[lang].demos;
+const item = t.items.find((d) => d.key === demo)!;
+---
+
+<article class="project-card">
+  <div class="project-visual" aria-hidden="true">
+    {
+      demo === 'inbox' && (
+        <div class="mini-ui">
+          <div class="mini-ui-head">
+            <i />
+            <i />
+            <i />
+            <span>Inbox</span>
+          </div>
+          {[1, 2, 3].map(() => (
+            <div class="mini-ui-row">
+              <b />
+              <em />
+              <small />
+            </div>
+          ))}
+        </div>
+      )
+    }
+    {
+      demo === 'chat' && (
+        <div class="mini-chat">
+          <div class="mini-chat__head">AI</div>
+          <div class="msg">· · ·</div>
+          <div class="msg right">· · · · · ·</div>
+        </div>
+      )
+    }
+    {
+      demo === 'integration' && (
+        <div class="mini-integration">
+          <div class="node">WEB</div>
+          <i class="node-line" />
+          <div class="node">↔</div>
+          <i class="node-line" />
+          <div class="node">CRM</div>
+        </div>
+      )
+    }
+  </div>
+  <div class="project-body">
+    <span class="tag">{t.tag}</span>
+    <h3>{item.title}</h3>
+    <p>{item.intro}</p>
+    <button class="btn-text" type="button" data-demo={demo}>{t.open} <span class="arrow">↗</span></button>
+  </div>
+</article>

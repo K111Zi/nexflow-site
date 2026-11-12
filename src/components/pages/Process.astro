@@ -1,0 +1,52 @@
+---
+import PageIntro from '../PageIntro.astro';
+import Lines from '../Lines.astro';
+import Cta from '../Cta.astro';
+import { ui, type Lang } from '../../i18n/ui';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = ui[lang].process;
+const num = (i: number) => String(i + 1).padStart(2, '0');
+---
+
+<PageIntro eyebrow={t.eyebrow} heading={t.heading} lead={t.lead} aside={t.aside} />
+
+<section class="container section">
+  <div class="eyebrow muted">{t.stepsEyebrow}</div>
+  <div class="timeline">
+    {
+      t.steps.map((s, i) => (
+        <div class="time-row">
+          <div class="label-num">{num(i)} /</div>
+          <h3>{s.title}</h3>
+          <p>{s.text}</p>
+        </div>
+      ))
+    }
+  </div>
+</section>
+
+<section class="section black-panel">
+  <div class="container">
+    <div class="eyebrow">{t.principlesEyebrow}</div>
+    <h2 class="section-title" style="margin:25px 0 30px"><Lines text={t.principlesTitle} /></h2>
+    <div class="process-grid" style="margin-top:42px">
+      {
+        t.principles.map((p, i) => (
+          <div class="process-col">
+            <span>{num(i)} /</span>
+            <h3>{p.title}</h3>
+            <p>{p.text}</p>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<div class="section"></div>
+<Cta lang={lang} />

@@ -1,0 +1,100 @@
+---
+// Виджет «Нужна подсказка?»: быстрые ссылки на разделы и ответы по ключевым словам. Без AI.
+import { ui, pagePath, type Lang } from '../i18n/ui';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = ui[lang].helper;
+const answers = t.answers.map((a) => ({
+  keywords: a.keywords
+    .split(',')
+    .map((k) => k.trim().toLowerCase())
+    .filter(Boolean),
+  text: a.text,
+  href: pagePath(lang, a.page),
+}));
+const data = JSON.stringify({ answers, empty: t.empty, fallback: t.fallback, go: t.go }).replace(/</g, '\\u003c');
+---
+
+<button type="button" class="helper-trigger" id="helper-trigger" aria-expanded="false" aria-controls="helper-panel">
+  <img src="/images/robot.png" alt="" width="38" height="38" />
+  <span class="helper-label">{t.trigger}</span>
+  <i class="chat-dot" aria-hidden="true"></i>
+</button>
+
+<aside class="helper-panel" id="helper-panel" aria-label={t.name}>
+  <div class="helper-head">
+    <img src="/images/robot.png" alt="" width="46" height="46" />
+    <div>
+      <b>{t.name}</b>
+      <small>{t.subtitle}</small>
+    </div>
+    <button type="button" class="helper-close" id="helper-close" aria-label={t.close}>×</button>
+  </div>
+  <div class="helper-content">
+    <p>{t.intro}</p>
+    <div class="helper-shortcuts">
+      {t.shortcuts.map((s) => <a href={pagePath(lang, s.page)}>{s.label}</a>)}
+    </div>
+    <label for="helper-question">{t.inputLabel}</label>
+    <form class="helper-input-row" id="helper-form">
+      <input id="helper-question" maxlength="180" placeholder={t.placeholder} autocomplete="off" />
+      <button type="submit" aria-label={t.send}>→</button>
+    </form>
+    <div class="helper-reply" id="helper-reply" aria-live="polite"></div>
+    <div class="helper-disclaimer">{t.disclaimer}</div>
+  </div>
+</aside>
+<script type="application/json" id="helper-data" set:html={data} />
+
+<script>
+  const data = JSON.parse(document.getElementById('helper-data')!.textContent || '{}') as {
+    answers: { keywords: string[]; text: string; href: string }[];
+    empty: string;
+    fallback: string;
+    go: string;
+  };
+  const trigger = document.getElementById('helper-trigger')!;
+  const panel = document.getElementById('helper-panel')!;
+  const input = document.getElementById('helper-question') as HTMLInputElement;
+  const reply = document.getElementById('helper-reply')!;
+
+  const toggle = (open: boolean) => {
+    panel.classList.toggle('open', open);
+    trigger.setAttribute('aria-expanded', String(open));
+    if (open) input.focus();
+  };
+
+  trigger.addEventListener('click', () => toggle(!panel.classList.contains('open')));
+  document.getElementById('helper-close')!.addEventListener('click', () => {
+    toggle(false);
+    trigger.focus();
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && panel.classList.contains('open')) {
+      toggle(false);
+      trigger.focus();
+    }
+  });
+
+  document.getElementById('helper-form')!.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const q = input.value.trim().toLowerCase();
+    if (!q) {
+      reply.textContent = data.empty;
+      return;
+    }
+    const match = data.answers.find((a) => a.keywords.some((k) => q.includes(k)));
+    if (!match) {
+      reply.textContent = data.fallback;
+      return;
+    }
+    const link = document.createElement('a');
+    link.href = match.href;
+    link.textContent = data.go;
+    reply.replaceChildren(document.createTextNode(match.text), link);
+  });
+</script>

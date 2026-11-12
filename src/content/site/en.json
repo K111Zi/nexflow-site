@@ -1,98 +1,244 @@
 {
-  "meta": {
-    "title": "NexFlow — websites, CRM and automation for businesses in Estonia",
-    "description": "Website development, CRM and business process automation for small and medium businesses in Estonia. All in one place."
-  },
   "nav": {
-    "services": "Services",
-    "why": "Why us",
-    "demo": "Examples",
-    "call": "Call",
-    "contact": "Contact"
+    "home": "Home",
+    "solutions": "Services",
+    "process": "Approach",
+    "projects": "Examples",
+    "about": "About",
+    "contact": "Contact",
+    "cta": "Get in touch"
   },
-  "cta": {
-    "lead": "Send a request",
-    "call": "Book a call"
+  "ui": {
+    "menuOpen": "Open menu",
+    "menuClose": "Close menu",
+    "themeToLight": "Switch to light theme",
+    "themeToDark": "Switch to dark theme",
+    "language": "Language",
+    "mainNav": "Main navigation",
+    "footerNav": "Footer navigation"
   },
-  "hero": {
-    "title": "Website, CRM and automation — all in one place",
-    "subtitle": "We help small and medium businesses in Estonia get more leads and spend less time on routine. We speak English, Estonian and Russian."
+  "home": {
+    "title": "NQO — AI assistants and business automation in Estonia",
+    "description": "We build AI assistants, automate incoming requests and connect CRMs, websites and messengers. Less routine, more time for your business.",
+    "eyebrow": "NQO — Never Quit Optimizing",
+    "heading": "Less routine.\nMore time\nfor business.",
+    "lead": "We build AI assistants and automate processes so your team can focus on what matters.",
+    "ctaPrimary": "Discuss your task",
+    "ctaSecondary": "Our solutions",
+    "bubble": "Need a hint\nwhere to start?",
+    "robotAlt": "NQO robot assistant",
+    "services": [
+      { "title": "Request handling", "text": "We automate how requests are received, routed and tracked." },
+      { "title": "AI assistants", "text": "We build digital helpers for consulting and support." },
+      { "title": "Integrations", "text": "We connect CRMs, websites, messengers and work tools." }
+    ],
+    "problemsEyebrow": "01 / Business challenges",
+    "problemsTitle": "Good automation\nstarts with a problem.",
+    "problemsLead": "First we find out what gets in the way of your work. Only then do we choose the technology.",
+    "problems": [
+      { "title": "Requests get lost between channels", "text": "Messages arrive in different messengers, by e-mail and through the website. Some never get an answer." },
+      { "title": "Staff spend time on routine", "text": "Standard replies, copying information, reports and repetitive operations." },
+      { "title": "Clients wait too long", "text": "The team can't keep up with standard questions, especially outside working hours." },
+      { "title": "Systems work in isolation", "text": "Data has to be copied between services by hand, which adds errors." }
+    ],
+    "approachEyebrow": "02 / Our approach",
+    "approachTitle": "Logic first.\nThen technology.",
+    "approachLead": "We don't add complexity for a flashy presentation. A solution should be clear and verifiable.",
+    "approach": [
+      { "label": "01 / Understand", "title": "We study the process", "text": "We find bottlenecks and define the inputs and the desired result." },
+      { "label": "02 / Build", "title": "We assemble the solution", "text": "We test scenarios and integrate the tool into your usual workflow." },
+      { "label": "03 / Improve", "title": "We measure the effect", "text": "We look at what has changed, fix errors and improve the result." }
+    ],
+    "approachCta": "More about our approach",
+    "demosEyebrow": "03 / Solution demos",
+    "demosTitle": "We don't just tell.\nWe show.",
+    "demosLead": "The examples below are concepts that show how automation can work."
   },
-  "services": {
-    "title": "Services",
-    "items": [
+  "solutions": {
+    "title": "Services — NQO",
+    "description": "Request handling, AI assistants, integrations of CRMs, websites and messengers. We choose tools to fit your process.",
+    "eyebrow": "Our services / Solutions",
+    "heading": "Technology for specific tasks.",
+    "lead": "We don't offer “AI for the sake of AI”. We choose tools to fit your process, workload and constraints.",
+    "aside": "Three directions that can be combined.",
+    "groupEyebrow": "Solution",
+    "groups": [
       {
-        "title": "Website development",
-        "text": "Landing pages and websites with request forms, online booking and more."
+        "title": "Request handling",
+        "text": "We bring all requests into one flow so that no important request gets lost.",
+        "items": [
+          { "title": "Collecting requests", "text": "Website, e-mail, forms and messengers in one process." },
+          { "title": "Routing", "text": "Each request goes to the right person according to set rules." },
+          { "title": "Notifications", "text": "Alerts about new requests and overdue replies." },
+          { "title": "Status tracking", "text": "A clear view of what is happening with every request." }
+        ]
       },
       {
-        "title": "CRM and leads",
-        "text": "Customer records, request tracking and sales automation."
+        "title": "AI assistants",
+        "text": "We automate standard conversations and internal requests with clear limits.",
+        "items": [
+          { "title": "Visitor support", "text": "Answers to frequent questions based on your company's materials." },
+          { "title": "Service navigation", "text": "Help choosing a product or the right section of the website." },
+          { "title": "Internal assistant", "text": "Finding instructions and giving hints to employees." },
+          { "title": "Handover to a person", "text": "Non-standard questions are passed to the responsible specialist." }
+        ]
       },
       {
-        "title": "Process automation",
-        "text": "Quotes, documents, reports, notifications and routine tasks."
+        "title": "Integrations and processes",
+        "text": "We connect the tools you already use and remove repeated manual input.",
+        "items": [
+          { "title": "CRM and forms", "text": "Fields and requests go into the right records." },
+          { "title": "Work notifications", "text": "Events from your systems reach the place where your team works." },
+          { "title": "Documents and reports", "text": "Standard materials prepared from agreed templates." },
+          { "title": "Error control", "text": "Checks and action logs to fix failures quickly." }
+        ]
       }
+    ],
+    "exampleLink": "See an example",
+    "noteTitle": "Please note.",
+    "note": "Specific integrations, cost and limitations are defined after we study your task. Not every process needs AI: sometimes simple automation is enough."
+  },
+  "process": {
+    "title": "Approach — NQO",
+    "description": "Five stages of work: diagnosis, design, prototype, implementation and improvement. At every stage you know what is being built and who checks the quality.",
+    "eyebrow": "How we work / Process",
+    "heading": "A clear process.\nA predictable result.",
+    "lead": "At every stage you know what is being built, who checks the quality and what the next step is.",
+    "aside": "From the first conversation to support.",
+    "stepsEyebrow": "Stages of work",
+    "steps": [
+      { "title": "Task diagnosis", "text": "We discuss what is done today, where delays happen and what a successful result looks like." },
+      { "title": "Solution design", "text": "We define the data, scenarios, constraints, quality criteria and who is responsible for checking." },
+      { "title": "Prototype", "text": "We build a working scenario and test it on ordinary and difficult examples." },
+      { "title": "Implementation", "text": "We connect the necessary systems, set up access and explain the workflow to your team." },
+      { "title": "Control and improvement", "text": "We check how it works, fix errors and gradually optimise the process." }
+    ],
+    "principlesEyebrow": "Implementation principles",
+    "principlesTitle": "Control matters more\nthan pretty magic.",
+    "principles": [
+      { "title": "People stay in control", "text": "Complex, risky and unclear cases are passed to an employee for review." },
+      { "title": "Errors can be fixed", "text": "We plan limits, an action log and a clear way to restore the process." },
+      { "title": "Results are measurable", "text": "We agree on metrics before implementation instead of promising results without data." }
     ]
   },
-  "why": {
-    "title": "Why NexFlow",
-    "items": [
-      {
-        "title": "One team",
-        "text": "Your website, CRM and automation work together — not through three different vendors."
-      },
-      {
-        "title": "Your language",
-        "text": "We discuss your task in English, Estonian or Russian."
-      },
-      {
-        "title": "Nothing extra",
-        "text": "We build what your business needs now and grow it as you grow."
-      }
-    ]
+  "projects": {
+    "title": "Solution examples — NQO",
+    "description": "Three demo automation scenarios: incoming requests, an AI assistant for a website, and a website-to-CRM connection.",
+    "eyebrow": "Examples / Projects",
+    "heading": "Here is how it can work.",
+    "lead": "Three demo scenarios. They help you picture the result before we look at your specific task.",
+    "aside": "No invented clients and no unconfirmed results.",
+    "tagline": "Each scheme shows the logic of a product, not a report on a completed order. Click “See the scenario” to go through the process step by step."
   },
-  "demo": {
-    "title": "Demo projects",
-    "note": "These are demo projects that show what we can build for your business.",
-    "badge": "Demo",
-    "items": [
-      {
-        "title": "Salon website",
-        "text": "A landing page with online booking and client reminders."
-      },
-      {
-        "title": "Lead CRM",
-        "text": "Every request from the website and messengers in one table with statuses."
-      },
-      {
-        "title": "Automatic quotes",
-        "text": "A quote is put together and sent to the client in a minute."
-      }
-    ]
-  },
-  "call": {
-    "title": "Free call",
-    "text": "Pick a time that suits you — in 20 minutes we will go through your task.",
-    "button": "Pick a time"
+  "about": {
+    "title": "About — NQO",
+    "description": "NQO — Never Quit Optimizing. We find what can be made simpler, more reliable and clearer in how a business works.",
+    "eyebrow": "About the company / About",
+    "heading": "Never Quit Optimizing.",
+    "lead": "NQO stands for continuous improvement. Our job is to find what can be made simpler, more reliable and clearer in how a business works.",
+    "aside": "Fewer promises. More clarity.",
+    "word": "NQO",
+    "tagline": ["Never", "Quit", "Optimizing"],
+    "valuesEyebrow": "What matters to us",
+    "valuesTitle": "Solutions are built\naround people and processes.",
+    "values": [
+      { "title": "Clarity", "text": "Clients should understand what the system does, why, and where its limits are." },
+      { "title": "Practicality", "text": "First we look for the real problem and a simple way to solve it. We don't add complexity without need." },
+      { "title": "Continuous improvement", "text": "After launch we collect feedback, fix weak spots and develop the product." }
+    ],
+    "note": "We are a young team from Estonia and work in English, Estonian and Russian. Real cases and reviews will appear here after our first completed projects."
   },
   "contact": {
-    "title": "Send a request",
-    "text": "Tell us what you need — we reply within one business day.",
-    "name": "Name",
-    "contact": "Phone or e-mail",
-    "task": "Task",
+    "title": "Contact — NQO",
+    "description": "Tell us which process takes up time or where requests get lost. We reply within one business day.",
+    "eyebrow": "Get in touch / Contact",
+    "heading": "Let's start\nwith your\ntask.",
+    "lead": "Tell us which process takes up time or where requests get lost. We'll suggest a direction to discuss.",
+    "howTitle": "How it works",
+    "howText": "You send a request → we study the task → we agree on a convenient format for a conversation. We reply within one business day.",
+    "channelsTitle": "Or message us directly",
+    "bookCall": "Book a call",
+    "formEyebrow": "Short task description",
+    "formTitle": "What would you like to improve?",
+    "name": "Your name *",
+    "namePlaceholder": "Name",
+    "company": "Company (optional)",
+    "companyPlaceholder": "Company name",
+    "contact": "E-mail or phone *",
+    "contactPlaceholder": "name@company.com",
+    "interest": "What are you interested in?",
+    "interestPlaceholder": "Choose a direction",
+    "interestOptions": ["Request handling", "AI assistant", "Integrations", "Not sure yet"],
+    "task": "Describe your task *",
+    "taskPlaceholder": "What isn't working the way you'd like?",
+    "consentBefore": "I agree to my data being processed to answer my request and have read the",
+    "consentLink": "privacy policy",
     "submit": "Send request",
-    "consent": "By clicking the button, you agree to the processing of your personal data.",
-    "messengers": "Or message us:",
     "sending": "Sending…",
     "success": "Thank you! Your request has been sent — we will reply within one business day.",
-    "error": "Could not send your request. Please try again or message us."
+    "error": "Could not send your request. Please try again or message us.",
+    "invalid": "Please fill in the required fields and tick the consent box."
+  },
+  "demos": {
+    "tag": "Demo scenario · not a client case",
+    "open": "See the scenario",
+    "modalEyebrow": "NQO / Interactive demo",
+    "modalNote": "An illustration of the process, not a working integration.",
+    "step": "Step",
+    "prev": "← Back",
+    "next": "Next →",
+    "restart": "Start over ↺",
+    "close": "Close",
+    "items": [
+      {
+        "key": "inbox",
+        "title": "Incoming request automation",
+        "intro": "How incoming requests can be collected, routed and tracked in a single flow.",
+        "steps": [
+          { "title": "A client sends a request", "text": "The request comes from the website or another channel." },
+          { "title": "The system identifies the request type", "text": "The request gets a category and a responsible team." },
+          { "title": "The responsible person is notified", "text": "The team receives the information without copying data by hand." },
+          { "title": "The status is saved", "text": "The manager sees what has been handled and what needs attention." }
+        ]
+      },
+      {
+        "key": "chat",
+        "title": "AI assistant for a website",
+        "intro": "A visitor consultation scenario: answers to standard questions and handover of difficult requests to an employee.",
+        "steps": [
+          { "title": "A visitor asks a question", "text": "A client's message appears in the chat." },
+          { "title": "The assistant looks for the right information", "text": "The answer is based on agreed company materials." },
+          { "title": "A next step is suggested", "text": "For example, opening the right service or leaving a request." },
+          { "title": "Unknown questions go to a person", "text": "The bot doesn't make up an answer when data is missing." }
+        ]
+      },
+      {
+        "key": "integration",
+        "title": "Website and CRM connection",
+        "intro": "A demo of passing data between tools without repeated manual input.",
+        "steps": [
+          { "title": "A record is created on the website", "text": "The user fills in a form." },
+          { "title": "The data is checked", "text": "The system checks required fields and formats." },
+          { "title": "The CRM receives a record", "text": "The information is matched to the right fields of the system." },
+          { "title": "The status returns to the interface", "text": "The responsible person sees a successful action or an error." }
+        ]
+      }
+    ]
+  },
+  "cta": {
+    "title": "Is there a task\nyou'd like to simplify?",
+    "text": "Tell us about the process. We'll suggest a sensible place to start.",
+    "button": "Discuss your task"
   },
   "footer": {
+    "eyebrow": "NQO / Never Quit Optimizing",
+    "title": "Tell us about your task.\nWe'll find a way to simplify it.",
+    "button": "Discuss a project",
     "privacy": "Privacy policy",
     "cookies": "Cookie settings",
-    "regCode": "Reg. code"
+    "regCode": "Reg. code",
+    "tagline": "Ideas turn into clear tools.",
+    "motto": "Made to simplify."
   },
   "cookie": {
     "text": "We use Google Analytics cookies to understand how visitors use the site. They are only turned on if you agree.",
@@ -100,14 +246,33 @@
     "decline": "Decline",
     "more": "Learn more"
   },
-  "legal": {
-    "back": "Back to home"
-  },
-  "themes": {
-    "label": "Theme",
-    "light": "Light",
-    "dark": "Dark",
-    "emerald": "Emerald",
-    "violet": "Violet"
+  "legal": { "eyebrow": "Documents / Privacy" },
+  "helper": {
+    "trigger": "Need a hint?",
+    "name": "NQO assistant",
+    "subtitle": "Site navigator",
+    "intro": "Hi! I'll help you find the right section.",
+    "shortcuts": [
+      { "label": "See services ↗", "page": "solutions" },
+      { "label": "See examples ↗", "page": "projects" },
+      { "label": "Stages of work ↗", "page": "process" },
+      { "label": "Get in touch ↗", "page": "contact" }
+    ],
+    "inputLabel": "Or type what you are looking for",
+    "placeholder": "For example: how do you work?",
+    "send": "Send",
+    "empty": "Type a question and I'll suggest the right section.",
+    "fallback": "For now I can only point you to sections of the site. Have a look at our services or write to us through the form.",
+    "go": "Go →",
+    "close": "Close",
+    "disclaimer": "This assistant uses pre-set hints and is not connected to AI.",
+    "answers": [
+      { "keywords": "request, lead, client, inquir", "text": "For handling incoming requests, see “Services” or the request handling demo.", "page": "solutions" },
+      { "keywords": "case, example, project, demo", "text": "In “Examples” you can open three interactive demo scenarios.", "page": "projects" },
+      { "keywords": "price, cost, how much, pricing, pay", "text": "The cost depends on the size of the process and the integrations. A short conversation about your task gives an honest estimate.", "page": "contact" },
+      { "keywords": "how, stage, step, time, process", "text": "The “Approach” page describes all five stages: diagnosis, design, prototype, implementation and improvement.", "page": "process" },
+      { "keywords": "contact, call, write, meet, discuss, email", "text": "The request form, messengers and call booking are in “Contact”.", "page": "contact" },
+      { "keywords": "bot, assistant, chat, ai", "text": "The “Services” page covers AI assistants, and “Examples” shows a user scenario.", "page": "solutions" }
+    ]
   }
 }

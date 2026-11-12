@@ -21,7 +21,7 @@ const analytics = { gaId: str(settings.analytics?.gaId) };
 // Работает только на Netlify или локально через `netlify dev`; при `npm run dev` форма покажет ошибку.
 export const FORM_ENDPOINT = '/api/lead';
 
-// Ссылка на запись в календаре (например, https://cal.com/nexflow/20min).
+// Ссылка на запись в календаре (например, https://cal.com/nqo/20min).
 export const BOOKING_URL = contacts.bookingUrl || '#';
 
 // Мессенджеры: из номера телефона и имени пользователя собираем ссылки.

@@ -1,0 +1,107 @@
+---
+// Пошаговое окно демо-сценария. Открывается кнопками с атрибутом data-demo="<ключ>".
+import { ui, type Lang } from '../i18n/ui';
+
+interface Props {
+  lang: Lang;
+}
+
+const t = ui[Astro.props.lang].demos;
+const data = JSON.stringify({ step: t.step, next: t.next, restart: t.restart, items: t.items }).replace(/</g, '\\u003c');
+---
+
+<div class="modal-wrap" id="demo-modal" role="dialog" aria-modal="true" aria-labelledby="demo-title">
+  <div class="modal">
+    <button class="modal-close" id="demo-close" type="button" aria-label={t.close}>×</button>
+    <div class="eyebrow">{t.modalEyebrow}</div>
+    <h2 id="demo-title"></h2>
+    <div class="modal-note">{t.modalNote}</div>
+    <div class="modal-steps" id="demo-steps"></div>
+    <div class="demo-workflow" id="demo-workflow" aria-live="polite"></div>
+    <div class="modal-actions">
+      <button class="btn btn-light" type="button" id="demo-prev">{t.prev}</button>
+      <button class="btn" type="button" id="demo-next">{t.next}</button>
+    </div>
+  </div>
+</div>
+<script type="application/json" id="demo-data" set:html={data} />
+
+<script>
+  type Demo = { key: string; title: string; steps: { title: string; text: string }[] };
+  const data = JSON.parse(document.getElementById('demo-data')!.textContent || '{}') as {
+    step: string;
+    next: string;
+    restart: string;
+    items: Demo[];
+  };
+
+  const modal = document.getElementById('demo-modal')!;
+  const title = document.getElementById('demo-title')!;
+  const bar = document.getElementById('demo-steps')!;
+  const box = document.getElementById('demo-workflow')!;
+  const prev = document.getElementById('demo-prev') as HTMLButtonElement;
+  const next = document.getElementById('demo-next') as HTMLButtonElement;
+  let demo: Demo | undefined;
+  let step = 0;
+  let opener: HTMLElement | null = null;
+
+  const el = (tag: string, cls?: string, text?: string) => {
+    const e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text) e.textContent = text;
+    return e;
+  };
+
+  function paint() {
+    if (!demo) return;
+    title.textContent = demo.title;
+    bar.replaceChildren(...demo.steps.map((_, i) => el('i', i <= step ? 'on' : '')));
+    const n = demo.steps.length;
+    box.replaceChildren(
+      el('div', 'label-num', `${data.step} 0${step + 1} / 0${n}`),
+      el('strong', '', demo.steps[step].title),
+      el('p', '', demo.steps[step].text),
+    );
+    prev.disabled = step === 0;
+    next.textContent = step === n - 1 ? data.restart : data.next;
+  }
+
+  function open(key: string, from: HTMLElement) {
+    demo = data.items.find((d) => d.key === key);
+    if (!demo) return;
+    step = 0;
+    opener = from;
+    paint();
+    modal.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    document.getElementById('demo-close')!.focus();
+  }
+
+  function close() {
+    if (!modal.classList.contains('open')) return;
+    modal.classList.remove('open');
+    document.body.style.overflow = '';
+    opener?.focus();
+  }
+
+  document.addEventListener('click', (e) => {
+    const btn = (e.target as HTMLElement).closest<HTMLElement>('[data-demo]');
+    if (btn) open(btn.dataset.demo!, btn);
+  });
+  document.getElementById('demo-close')!.addEventListener('click', close);
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) close();
+  });
+  next.addEventListener('click', () => {
+    if (!demo) return;
+    step = (step + 1) % demo.steps.length;
+    paint();
+  });
+  prev.addEventListener('click', () => {
+    step = Math.max(0, step - 1);
+    paint();
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') close();
+  });
+</script>

@@ -21,7 +21,7 @@ export const PRIVACY_UPDATED = '2026-11-12';
 export const privacy: Record<Lang, PrivacyDict> = {
   ru: {
     title: 'Политика конфиденциальности',
-    description: 'Как NexFlow обрабатывает персональные данные посетителей сайта и клиентов.',
+    description: 'Как NQO обрабатывает персональные данные посетителей сайта и клиентов.',
     updated: 'Обновлено',
     sections: [
       {
@@ -83,7 +83,7 @@ export const privacy: Record<Lang, PrivacyDict> = {
 
   et: {
     title: 'Privaatsuspoliitika',
-    description: 'Kuidas NexFlow töötleb veebilehe külastajate ja klientide isikuandmeid.',
+    description: 'Kuidas NQO töötleb veebilehe külastajate ja klientide isikuandmeid.',
     updated: 'Uuendatud',
     sections: [
       {
@@ -145,7 +145,7 @@ export const privacy: Record<Lang, PrivacyDict> = {
 
   en: {
     title: 'Privacy policy',
-    description: 'How NexFlow processes the personal data of website visitors and clients.',
+    description: 'How NQO processes the personal data of website visitors and clients.',
     updated: 'Updated',
     sections: [
       {
