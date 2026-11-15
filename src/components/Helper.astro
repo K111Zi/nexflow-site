@@ -62,10 +62,16 @@ const data = JSON.stringify({ answers, empty: t.empty, fallback: t.fallback, go:
   const input = document.getElementById('helper-question') as HTMLInputElement;
   const reply = document.getElementById('helper-reply')!;
 
+  // Робот на главной реагирует на работу подсказчика (см. RobotOrb.astro).
+  const robot = (seq: [string, number][]) => window.dispatchEvent(new CustomEvent('nqo:robot', { detail: { seq } }));
+
   const toggle = (open: boolean) => {
     panel.classList.toggle('open', open);
     trigger.setAttribute('aria-expanded', String(open));
-    if (open) input.focus();
+    if (open) {
+      input.focus();
+      robot([['listening', 2200]]);
+    }
   };
 
   trigger.addEventListener('click', () => toggle(!panel.classList.contains('open')));
@@ -85,13 +91,16 @@ const data = JSON.stringify({ answers, empty: t.empty, fallback: t.fallback, go:
     const q = input.value.trim().toLowerCase();
     if (!q) {
       reply.textContent = data.empty;
+      robot([['disagree', 1500]]);
       return;
     }
     const match = data.answers.find((a) => a.keywords.some((k) => q.includes(k)));
     if (!match) {
       reply.textContent = data.fallback;
+      robot([['searching', 900], ['sorry', 2000]]);
       return;
     }
+    robot([['searching', 900], ['agree', 1800]]);
     const link = document.createElement('a');
     link.href = match.href;
     link.textContent = data.go;

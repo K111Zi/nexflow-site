@@ -1,7 +1,13 @@
 ---
-// Робот NQO на первом экране: шар (картинка без глаз) + глаза в SVG,
-// которые «живут» на поверхности сферы, следят за курсором и иногда моргают.
+// Робот NQO на первом экране: шар (картинка без глаз) + лицо в SVG.
+// Глаза «живут» на поверхности сферы, следят за курсором, моргают и меняют выражение
+// по листу «Спектр эмоций NQO»: базовые эмоции, рабочие состояния (значок вместо глаз),
+// реакции на пользователя и дополнительные эмоции. Шар целиком наклоняется за курсором.
 // Координаты — в системе картинки 322×322; шар — эллипс (171, 163), 147.5 × 155.
+//
+// Управление извне (любой скрипт на странице):
+//   window.dispatchEvent(new CustomEvent('nqo:robot', { detail: { face: 'done', ms: 1500 } }))
+//   window.dispatchEvent(new CustomEvent('nqo:robot', { detail: { seq: [['searching', 900], ['agree', 1600]] } }))
 
 interface Props {
   alt: string;
@@ -29,29 +35,35 @@ const config = JSON.stringify({ ball: BALL, rest: REST, eyes: EYES });
 ---
 
 <span class="orb" data-robot={config}>
-  <img src="/images/robot-body.png" alt={alt} width="310" height="310" fetchpriority="high" />
-  <svg class="orb-eyes" viewBox="0 0 322 322" aria-hidden="true">
-    <defs>
-      <clipPath id="orb-clip"><ellipse cx="171" cy="163" rx="146" ry="153.5"></ellipse></clipPath>
-      <filter id="eye-glow" x="-60%" y="-150%" width="220%" height="400%">
-        <feGaussianBlur stdDeviation="2" result="blur"></feGaussianBlur>
-        <feMerge>
-          <feMergeNode in="blur"></feMergeNode>
-          <feMergeNode in="blur"></feMergeNode>
-          <feMergeNode in="SourceGraphic"></feMergeNode>
-        </feMerge>
-      </filter>
-    </defs>
-    <g clip-path="url(#orb-clip)">
-      <g filter="url(#eye-glow)" fill="#fff" stroke="#fff" stroke-width="3" stroke-linejoin="round">
-        {
-          EYES.map((e) => (
-            <path class="orb-eye" d="M-42 9 Q0 -28 42 9 Q0 -8 -42 9Z" transform={transform(REST.lon + e.dLon, REST.lat + e.dLat)} />
-          ))
-        }
-      </g>
-    </g>
-  </svg>
+  <span class="orb-act">
+    <span class="orb-lean">
+      <img src="/images/robot-body.png" alt={alt} width="310" height="310" fetchpriority="high" />
+      <svg class="orb-eyes" viewBox="0 0 322 322" aria-hidden="true">
+        <defs>
+          <clipPath id="orb-clip"><ellipse cx="171" cy="163" rx="146" ry="153.5"></ellipse></clipPath>
+          <filter id="eye-glow" x="-60%" y="-150%" width="220%" height="400%">
+            <feGaussianBlur stdDeviation="2" result="blur"></feGaussianBlur>
+            <feMerge>
+              <feMergeNode in="blur"></feMergeNode>
+              <feMergeNode in="blur"></feMergeNode>
+              <feMergeNode in="SourceGraphic"></feMergeNode>
+            </feMerge>
+          </filter>
+        </defs>
+        <g clip-path="url(#orb-clip)">
+          <g filter="url(#eye-glow)" fill="#fff" stroke="#fff" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
+            {
+              EYES.map((e) => (
+                <path class="orb-eye" d="M-42 9 Q0 -28 42 9 Q0 -8 -42 9Z" transform={transform(REST.lon + e.dLon, REST.lat + e.dLat)} />
+              ))
+            }
+            <g class="orb-glyph" fill="none" stroke-width="6" opacity="0"></g>
+          </g>
+        </g>
+        <g class="orb-acc" transform="translate(50 36)"><g class="orb-acc-in"></g></g>
+      </svg>
+    </span>
+  </span>
 </span>
 
 <script>
@@ -60,6 +72,16 @@ const config = JSON.stringify({ ball: BALL, rest: REST, eyes: EYES });
     rest: { lon: number; lat: number };
     eyes: { dLon: number; dLat: number }[];
   };
+  type Eye = { d: string; line?: boolean; rot?: number; w?: number };
+  type Face = {
+    l?: Eye; // левый глаз; правый — зеркальная копия, если не задан r
+    r?: Eye;
+    glyph?: string; // значок вместо глаз (рабочие состояния)
+    acc?: string; // значок рядом с шаром
+    gesture?: 'hop' | 'nod' | 'shake' | 'wiggle' | 'pulse';
+    look?: { lon: number; lat: number }; // куда смотреть, пока выражение активно
+  };
+  type Step = [string, number];
 
   const orb = document.querySelector<HTMLElement>('.orb[data-robot]');
   const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -67,35 +89,234 @@ const config = JSON.stringify({ ball: BALL, rest: REST, eyes: EYES });
   if (orb && !reduce) {
     const cfg = JSON.parse(orb.dataset.robot!) as Cfg;
     const eyes = Array.from(orb.querySelectorAll<SVGPathElement>('.orb-eye'));
+    const glyphEl = orb.querySelector<SVGGElement>('.orb-glyph')!;
+    const accEl = orb.querySelector<SVGGElement>('.orb-acc')!;
+    const accIn = orb.querySelector<SVGGElement>('.orb-acc-in')!;
+    const actEl = orb.querySelector<HTMLElement>('.orb-act')!;
+    const leanEl = orb.querySelector<HTMLElement>('.orb-lean')!;
     const { cx, cy, rx, ry } = cfg.ball;
     const rad = (d: number) => (d * Math.PI) / 180;
     const clamp01 = (v: number) => Math.max(0, Math.min(1, v));
 
+    // ---------- Формы глаз (локальные координаты глаза, ширина ≈ ±42) ----------
+    const spiral = (() => {
+      let d = '';
+      for (let t = 0; t <= 3.5 * Math.PI; t += 0.25) {
+        const r = 2 + 2.3 * t;
+        d += `${t === 0 ? 'M' : 'L'}${(r * Math.cos(t)).toFixed(1)} ${(r * Math.sin(t)).toFixed(1)}`;
+      }
+      return d;
+    })();
+    const S = {
+      arch: { d: 'M-42 9 Q0 -28 42 9 Q0 -8 -42 9Z' },
+      thin: { d: 'M-40 8 Q0 -22 40 8 Q0 -12 -40 8Z' },
+      bar: { d: 'M-34 -4 H34 V4 H-34Z' },
+      oval: { d: 'M-13 0 A13 24 0 1 0 13 0 A13 24 0 1 0 -13 0Z' },
+      ovalSm: { d: 'M-11 0 A11 20 0 1 0 11 0 A11 20 0 1 0 -11 0Z' },
+      chevron: { d: 'M-18 -18 L18 0 L-18 18', line: true },
+      lidFlat: { d: 'M-36 -6 H36 Q30 18 0 18 Q-30 18 -36 -6Z' },
+      lidSlant: { d: 'M-36 -13 L36 3 Q20 22 -8 20 Q-34 16 -36 -13Z' },
+      lidMild: { d: 'M-36 -8 L36 0 Q22 20 -6 19 Q-32 16 -36 -8Z' },
+      sad: { d: 'M-30 11 Q2 -2 30 -9', line: true },
+      cup: { d: 'M-30 -6 Q0 15 30 -6', line: true },
+      cupFlat: { d: 'M-32 -2 Q0 8 32 -2', line: true },
+      flat: { d: 'M-30 0 H30', line: true },
+      spiral: { d: spiral, line: true, w: 5 },
+    } satisfies Record<string, Eye>;
+
+    // ---------- Значки вместо глаз (центр лица, размер ≈ ±30) ----------
+    const spin = (dur: string) =>
+      `<animateTransform attributeName="transform" type="rotate" from="0" to="360" dur="${dur}" repeatCount="indefinite"/>`;
+    const fade = (begin: string, dur = '1.2s') =>
+      `<animate attributeName="opacity" values=".2;1;.2" dur="${dur}" begin="${begin}" repeatCount="indefinite"/>`;
+    const G: Record<string, string> = {
+      dots: [-24, 0, 24]
+        .map((x, i) => `<circle cx="${x}" r="6.5" fill="#fff" stroke="none">${fade(`${-0.8 + i * 0.4}s`)}</circle>`)
+        .join(''),
+      ring: `<circle r="25" stroke-width="7" stroke-dasharray="1 10.22">${spin('4s')}</circle>`,
+      arc: `<circle r="25" opacity=".25"/><path d="M0 -25 A25 25 0 1 1 -25 0">${spin('1.1s')}</path>`,
+      search: `<g><circle cx="-5" cy="-5" r="17"/><path d="M8 8 L25 25"/><animateTransform attributeName="transform" type="translate" values="-7 2;6 -4;3 5;-7 2" dur="2.4s" repeatCount="indefinite"/></g>`,
+      layers: `<path d="M0 -24 L28 -10 L0 4 L-28 -10Z">${fade('-1.6s', '1.8s')}</path><path d="M-28 2 L0 16 L28 2">${fade('-1s', '1.8s')}</path><path d="M-28 13 L0 27 L28 13">${fade('-0.4s', '1.8s')}</path>`,
+      sync: `<g><path d="M-22 -10 A24 24 0 0 1 21 -12"/><path d="M22 -27 V-11 H6"/><path d="M22 10 A24 24 0 0 1 -21 12"/><path d="M-22 27 V11 H-6"/>${spin('2.2s')}</g>`,
+      check: `<path class="orb-draw" pathLength="1" d="M-27 1 L-8 20 L28 -19" stroke-width="8"/>`,
+      cross: `<path d="M-21 -21 L21 21 M21 -21 L-21 21" stroke-width="8"/>`,
+      heart: `<path d="M0 25 C-44 -4 -22 -32 0 -11 C22 -32 44 -4 0 25Z"><animate attributeName="stroke-width" values="6;9;6" dur="1.1s" repeatCount="indefinite"/></path>`,
+    };
+
+    // ---------- Значки рядом с шаром (слева сверху; справа — облачко с текстом) ----------
+    const A: Record<string, string> = {
+      sparks: `<path d="M8 6 L14 -8 M-4 0 L-8 -16 M-14 8 L-28 0"/>`,
+      check: `<circle r="14"/><path d="M-7 0 L-2 6 L8 -6"/>`,
+      heart: `<path d="M0 15 C-26 -2 -13 -19 0 -6 C13 -19 26 -2 0 15Z"/>`,
+      bolt: `<path d="M5 -21 L-10 3 H0 L-5 21 L10 -3 H0Z"/>`,
+      star: `<path d="M0 -21 Q2 -2 21 0 Q2 2 0 21 Q-2 2 -21 0 Q-2 -2 0 -21Z"/>`,
+      zzz: `<path d="M-2 4 H12 L-2 20 H12 M-14 -8 H-4 L-14 4 H-4 M-24 -20 H-17 L-24 -11 H-17"/>`,
+      waves: `<path d="M7.9 -1.1 A8 8 0 0 0 7.9 9.1 M1.7 -6.3 A16 16 0 0 0 1.7 14.3 M-4.4 -11.4 A24 24 0 0 0 -4.4 19.4"/>`,
+    };
+
+    // ---------- Выражения с листа «Спектр эмоций NQO» ----------
+    const FACES: Record<string, Face> = {
+      // Базовые эмоции
+      neutral: { l: S.bar },
+      joy: { l: S.arch },
+      smile: { l: S.thin },
+      laugh: { l: S.chevron, acc: 'sparks', gesture: 'hop' },
+      surprise: { l: S.oval, gesture: 'pulse' },
+      interest: { l: { ...S.lidSlant, rot: -8 }, r: { ...S.oval, rot: 14 } },
+      focus: { l: S.lidSlant },
+      thoughtful: { l: S.lidFlat, look: { lon: -24, lat: 20 } },
+      // Рабочие состояния
+      thinking: { glyph: 'dots' },
+      analyzing: { glyph: 'ring' },
+      processing: { glyph: 'arc' },
+      searching: { glyph: 'search' },
+      creating: { glyph: 'layers' },
+      syncing: { glyph: 'sync' },
+      done: { glyph: 'check', gesture: 'nod' },
+      error: { glyph: 'cross', gesture: 'shake' },
+      // Реакции на пользователя
+      greeting: { l: S.arch, acc: 'sparks', gesture: 'hop' },
+      listening: { l: S.ovalSm },
+      agree: { l: S.arch, acc: 'check', gesture: 'nod' },
+      disagree: { l: S.lidFlat, gesture: 'shake' },
+      support: { glyph: 'heart' },
+      thanks: { l: S.arch, acc: 'heart', gesture: 'pulse' },
+      sorry: { l: S.sad, look: { lon: 10, lat: -10 } },
+      bye: { l: S.arch, acc: 'waves', gesture: 'wiggle' },
+      // Дополнительные эмоции
+      inspiration: { l: S.arch, acc: 'star', look: { lon: -10, lat: 22 } },
+      confidence: { l: S.lidMild },
+      motivation: { l: S.arch, acc: 'bolt', gesture: 'hop' },
+      pride: { l: S.cup, look: { lon: 20, lat: 18 } },
+      calm: { l: S.cupFlat },
+      tired: { l: S.flat, acc: 'zzz', look: { lon: 18, lat: -12 } },
+      confused: { l: S.spiral, gesture: 'wiggle' },
+      lightLaugh: { l: S.chevron, r: S.arch },
+    };
+
+    // ---------- Состояние ----------
     const cur = { ...cfg.rest };
     let target = { ...cfg.rest };
+    let look: Face['look'] | null = null;
     let blink = 1;
+    let lid = 1; // 1 — лицо открыто, 0 — «закрыто» на время смены выражения
+    let lidTarget = 1;
+    let pending: Face | null = null;
+    let glyphOn = false;
+    let eyeRot = [0, 0];
+    let eyeSx = [1, -1];
     let idleTimer = 0;
     let visible = true;
 
+    let face = 'joy';
+    let hoverFace: string | null = null;
+    let sleeping = false;
+    let playing = false;
+    let stepTimer = 0;
+    let lastActive = performance.now();
+    let lastBye = 0;
+    const previewParam = new URLSearchParams(location.search).get('robot');
+    const preview = previewParam && FACES[previewParam] ? previewParam : null;
+
+    const gesture = (name?: Face['gesture']) => {
+      actEl.className = 'orb-act';
+      if (!name) return;
+      void actEl.offsetWidth; // перезапуск анимации
+      actEl.classList.add(`g-${name}`);
+    };
+
+    const apply = (fc: Face) => {
+      glyphOn = !!fc.glyph;
+      if (fc.glyph) {
+        glyphEl.innerHTML = G[fc.glyph];
+      } else {
+        glyphEl.innerHTML = '';
+        const l = fc.l ?? S.arch;
+        const pair: Eye[] = [l, fc.r ?? l];
+        const mirror = !fc.r;
+        pair.forEach((eye, i) => {
+          const el = eyes[i];
+          el.setAttribute('d', eye.d);
+          el.setAttribute('fill', eye.line ? 'none' : '#fff');
+          el.setAttribute('stroke-width', String(eye.w ?? (eye.line ? 8 : 3)));
+          eyeRot[i] = rad(eye.rot ?? 0) * (mirror && i === 1 ? -1 : 1);
+          eyeSx[i] = mirror && i === 1 ? -1 : 1;
+        });
+      }
+      glyphEl.setAttribute('opacity', glyphOn ? '1' : '0');
+      accIn.innerHTML = fc.acc ? A[fc.acc] : '';
+      accEl.classList.toggle('on', !!fc.acc);
+      look = fc.look ?? null;
+      gesture(fc.gesture);
+    };
+
+    // Смена выражения: лицо «закрывается», форма меняется, лицо открывается.
+    const show = (name: string, force = false) => {
+      if (!FACES[name] || (name === face && !force)) return;
+      face = name;
+      pending = FACES[name];
+      lidTarget = 0;
+    };
+    const settle = () => {
+      playing = false;
+      show(sleeping ? 'tired' : (hoverFace ?? 'joy'));
+    };
+    const play = (steps: Step[]) => {
+      if (preview) return;
+      clearTimeout(stepTimer);
+      playing = true;
+      let i = 0;
+      const next = () => {
+        if (i >= steps.length) return settle();
+        const [name, ms] = steps[i++];
+        show(name, true);
+        stepTimer = window.setTimeout(next, ms);
+      };
+      next();
+    };
+
     const draw = () => {
+      const sy = blink * lid;
       eyes.forEach((el, i) => {
         const lo = rad(cur.lon + cfg.eyes[i].dLon);
         const la = rad(cur.lat + cfg.eyes[i].dLat);
         const x = cx + rx * Math.sin(lo) * Math.cos(la);
         const y = cy - ry * Math.sin(la);
-        const a = Math.cos(lo);
-        const c = Math.sin(lo) * Math.sin(la) * blink;
-        const d = Math.cos(la) * blink;
-        el.setAttribute('transform', `matrix(${a.toFixed(3)} 0 ${c.toFixed(3)} ${d.toFixed(3)} ${x.toFixed(2)} ${y.toFixed(2)})`);
-        // глаз, ушедший за край шара, плавно гаснет
-        el.style.opacity = String(clamp01((a - 0.1) / 0.25));
+        // проекция на сферу × локальный поворот/зеркало/моргание глаза
+        const A0 = Math.cos(lo), C0 = Math.sin(lo) * Math.sin(la), D0 = Math.cos(la);
+        const co = Math.cos(eyeRot[i]), si = Math.sin(eyeRot[i]), sx = eyeSx[i];
+        const a = (A0 * co + C0 * si) * sx;
+        const b = D0 * si * sx;
+        const c = (-A0 * si + C0 * co) * sy;
+        const d = D0 * co * sy;
+        el.setAttribute('transform', `matrix(${a.toFixed(3)} ${b.toFixed(3)} ${c.toFixed(3)} ${d.toFixed(3)} ${x.toFixed(2)} ${y.toFixed(2)})`);
+        // глаз, ушедший за край шара, плавно гаснет; при значке глаза скрыты
+        el.style.opacity = glyphOn ? '0' : String(clamp01((A0 - 0.1) / 0.25));
       });
+      if (glyphOn) {
+        const lo = rad(cur.lon), la = rad(cur.lat);
+        const x = cx + rx * Math.sin(lo) * Math.cos(la);
+        const y = cy - ry * Math.sin(la);
+        const a = Math.cos(lo) * lid, c = Math.sin(lo) * Math.sin(la) * lid, d = Math.cos(la) * lid;
+        glyphEl.setAttribute('transform', `matrix(${a.toFixed(3)} 0 ${c.toFixed(3)} ${d.toFixed(3)} ${x.toFixed(2)} ${y.toFixed(2)})`);
+      }
+      // шар целиком слегка поворачивается и тянется за взглядом
+      leanEl.style.transform = `translate(${(cur.lon * 0.16).toFixed(2)}px, ${(-cur.lat * 0.14).toFixed(2)}px) rotate(${(cur.lon * 0.09).toFixed(2)}deg)`;
+    };
+
+    // ---------- Реакции на пользователя ----------
+    const wake = () => {
+      lastActive = performance.now();
+      if (!sleeping) return;
+      sleeping = false;
+      play([['surprise', 900]]);
     };
 
     // Курсор относительно центра робота → куда смотреть.
     window.addEventListener(
       'pointermove',
       (e) => {
+        wake();
         const r = orb.getBoundingClientRect();
         const dx = e.clientX - (r.left + r.width / 2);
         const dy = e.clientY - (r.top + r.height / 2);
@@ -105,7 +326,110 @@ const config = JSON.stringify({ ball: BALL, rest: REST, eyes: EYES });
       },
       { passive: true },
     );
-    document.addEventListener('mouseleave', () => (target = { ...cfg.rest }));
+    ['pointerdown', 'keydown', 'scroll'].forEach((ev) => window.addEventListener(ev, wake, { passive: true }));
+
+    // Курсор ушёл со страницы — прощание; вернулся — приветствие.
+    document.addEventListener('mouseleave', () => {
+      target = { ...cfg.rest };
+      const now = performance.now();
+      if (sleeping || now - lastBye < 8000) return;
+      lastBye = now;
+      hoverFace = null;
+      play([['bye', 2000]]);
+    });
+    document.addEventListener('mouseenter', () => {
+      if (face === 'bye') play([['greeting', 1500]]);
+    });
+
+    // Наведение на элементы страницы: робот показывает отношение, пока курсор на них.
+    const hoverMap: [string, string][] = [
+      ['.orb', 'listening'],
+      ['.btn', 'motivation'],
+      ['.btn-text', 'interest'],
+      ['.service-tile', 'inspiration'],
+      ['.theme-toggle', 'interest'],
+      ['.helper-trigger', 'confidence'],
+    ];
+    document.addEventListener('pointerover', (e) => {
+      if (e.pointerType !== 'mouse' || !(e.target instanceof Element)) return;
+      const hit = hoverMap.find(([sel]) => (e.target as Element).closest(sel));
+      const next = hit ? hit[1] : null;
+      if (next === hoverFace) return;
+      hoverFace = next;
+      if (!playing && !sleeping) show(hoverFace ?? 'joy');
+    });
+
+    // Клик по роботу: смех; много кликов подряд — растерянность.
+    let clicks = 0;
+    let clickTimer = 0;
+    orb.addEventListener('click', () => {
+      clicks += 1;
+      clearTimeout(clickTimer);
+      clickTimer = window.setTimeout(() => (clicks = 0), 1200);
+      if (clicks >= 4) {
+        clicks = 0;
+        play([['confused', 2200], ['sorry', 1400]]);
+      } else {
+        play([[clicks === 1 ? 'laugh' : 'lightLaugh', 1500]]);
+      }
+    });
+
+    // Клики по важным элементам.
+    document.addEventListener('click', (e) => {
+      if (!(e.target instanceof Element)) return;
+      if (e.target.closest('.theme-toggle')) play([['surprise', 900], ['smile', 900]]);
+      else if (e.target.closest('.btn')) play([['thanks', 1800]]);
+      else if (e.target.closest('[data-demo]')) play([['processing', 1200], ['done', 1200]]);
+    });
+
+    // Внешнее управление (подсказчик, формы и т. п.).
+    window.addEventListener('nqo:robot', (e) => {
+      const d = (e as CustomEvent<{ face?: string; ms?: number; seq?: Step[] }>).detail || {};
+      wake();
+      if (d.seq?.length) play(d.seq);
+      else if (d.face) play([[d.face, d.ms ?? 1600]]);
+    });
+
+    // ---------- Самостоятельная жизнь ----------
+    const idleShows: Step[][] = [
+      [['smile', 2200]],
+      [['thoughtful', 2400], ['inspiration', 1700]],
+      [['calm', 2400]],
+      [['pride', 2000]],
+      [['neutral', 1100], ['interest', 1700]],
+      [['focus', 1500], ['confidence', 1500]],
+      [['lightLaugh', 1500]],
+      [['support', 2000]],
+      [['thinking', 1800], ['done', 1300]],
+      [['analyzing', 2000], ['done', 1300]],
+      [['searching', 2200], ['inspiration', 1500]],
+      [['processing', 1800], ['creating', 2000], ['done', 1300]],
+      [['syncing', 2200], ['agree', 1500]],
+    ];
+    let lastIdle = -1;
+    const scheduleIdle = () =>
+      window.setTimeout(
+        () => {
+          if (visible && !document.hidden && !playing && !sleeping && !hoverFace) {
+            let i = Math.floor(Math.random() * idleShows.length);
+            if (i === lastIdle) i = (i + 1) % idleShows.length;
+            lastIdle = i;
+            play(idleShows[i]);
+          }
+          scheduleIdle();
+        },
+        7000 + Math.random() * 6000,
+      );
+    scheduleIdle();
+
+    // Долго никто ничего не делает — робот засыпает.
+    window.setInterval(() => {
+      if (!sleeping && !playing && visible && performance.now() - lastActive > 45000) {
+        sleeping = true;
+        hoverFace = null;
+        show('tired');
+      }
+    }, 3000);
 
     // Моргание раз в 2.5–6 секунд.
     const scheduleBlink = () =>
@@ -122,18 +446,34 @@ const config = JSON.stringify({ ball: BALL, rest: REST, eyes: EYES });
         };
         requestAnimationFrame(step);
       }, 2500 + Math.random() * 3500);
-    scheduleBlink();
+    if (!preview) scheduleBlink();
 
     // Плавное движение; пока робот не на экране — не тратим ресурсы.
     new IntersectionObserver(([entry]) => (visible = entry.isIntersecting)).observe(orb);
     const loop = () => {
       if (visible) {
-        cur.lon += (target.lon - cur.lon) * 0.1;
-        cur.lat += (target.lat - cur.lat) * 0.1;
+        const to = look ?? target;
+        cur.lon += (to.lon - cur.lon) * 0.1;
+        cur.lat += (to.lat - cur.lat) * 0.1;
+        lid += (lidTarget - lid) * 0.34;
+        if (pending && lid < 0.14) {
+          apply(pending);
+          pending = null;
+          lidTarget = 1;
+        }
         draw();
       }
       requestAnimationFrame(loop);
     };
     requestAnimationFrame(loop);
+
+    // Приветствие при загрузке. Для просмотра одного выражения: адрес с ?robot=tired (имя из FACES).
+    if (preview) {
+      playing = true; // держим выражение, остальное поведение выключено
+      face = preview;
+      apply(FACES[preview]);
+    } else {
+      window.setTimeout(() => play([['greeting', 2200]]), 500);
+    }
   }
 </script>
